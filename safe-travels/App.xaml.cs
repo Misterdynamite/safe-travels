@@ -1,16 +1,19 @@
-﻿namespace safe_travels.Views;
+﻿namespace safe_travels;
 using Microsoft.Maui;
+using safe_travels.Views;
+
 
 public partial class App : Application
 {
     public App()
     {
         InitializeComponent();
-        MainPage = new JourneyPlannerPage();
+        // Removed obsolete MainPage assignment
     }
 
     protected override Window CreateWindow(IActivationState? activationState)
     {
-        return new Window(new AppShell());
+        // Set the root page here instead of using MainPage
+        return new Window(new JourneyPlannerPage());
     }
 }
