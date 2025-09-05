@@ -14,6 +14,6 @@ public partial class App : Application
     protected override Window CreateWindow(IActivationState? activationState)
     {
         // Set the root page here instead of using MainPage
-        return new Window(new JourneyPlannerPage());
+        return new Window(new MainPage());
     }
 }

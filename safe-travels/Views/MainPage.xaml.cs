@@ -15,7 +15,6 @@ namespace safe_travels
 
         private async void OnSearch(object sender, EventArgs e)
         {
-            Console.WriteLine("Button clicked");
 
             StopsCalls aTAPIDEMO = new StopsCalls();
             string searchText = BusSearch.Text;
@@ -26,8 +25,7 @@ namespace safe_travels
             try
             {
                 // Fetch data
-                List<StopData> data = await aTAPIDEMO.testTask(searchText);
-
+                List<StopData> data = await aTAPIDEMO.GetStopsByName(searchText);
                 // Bind the data to ListView
                 BusListView.ItemsSource = data;
             }

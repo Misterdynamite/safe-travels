@@ -36,7 +36,7 @@
             <ListView x:Name="BusListView">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <TextCell Text="{Binding attributes.name}" Detail="{Binding id}" />
+                        <TextCell Text="{Binding attributes.stopName}" Detail="{Binding id}" />
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
