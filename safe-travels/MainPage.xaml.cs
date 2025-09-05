@@ -1,4 +1,4 @@
-﻿using safe_travels;
+﻿using safe_travels.API.AucklandTransportAPI;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -17,7 +17,7 @@ namespace safe_travels
         {
             Console.WriteLine("Button clicked");
 
-            ApiCall aTAPIDEMO = new ApiCall();
+            StopsCalls aTAPIDEMO = new StopsCalls();
             string searchText = BusSearch.Text;
 
             if (string.IsNullOrWhiteSpace(searchText))
