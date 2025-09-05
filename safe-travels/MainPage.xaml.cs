@@ -1,4 +1,8 @@
-﻿namespace safe_travels
+﻿using safe_travels;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace safe_travels
 {
     public partial class MainPage : ContentPage
     {
@@ -9,16 +13,31 @@
             InitializeComponent();
         }
 
-        private void OnCounterClicked(object? sender, EventArgs e)
+        private async void OnSearch(object sender, EventArgs e)
         {
-            count++;
+            Console.WriteLine("Button clicked");
 
-            if (count == 1)
-                CounterBtn.Text = $"Clicked {count} time";
-            else
-                CounterBtn.Text = $"Clicked {count} times";
+            ApiCall aTAPIDEMO = new ApiCall();
+            string searchText = BusSearch.Text;
 
-            SemanticScreenReader.Announce(CounterBtn.Text);
+            if (string.IsNullOrWhiteSpace(searchText))
+                return;
+
+            try
+            {
+                // Fetch data
+                List<StopData> data = await aTAPIDEMO.testTask(searchText);
+
+                // Bind the data to ListView
+                BusListView.ItemsSource = data;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching data: {ex.Message}");
+                await DisplayAlert("Error", "Could not fetch stops.", "OK");
+            }
         }
+
+
     }
 }

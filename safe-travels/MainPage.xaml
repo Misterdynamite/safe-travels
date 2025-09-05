@@ -23,13 +23,23 @@
                 Style="{StaticResource SubHeadline}"
                 SemanticProperties.HeadingLevel="Level2"
                 SemanticProperties.Description="Welcome to dot net Multi platform App U I" />
-
+            <SearchBar
+                x:Name="BusSearch"
+                Placeholder="Enter the name of the stop you want to see"
+                />
             <Button
                 x:Name="CounterBtn"
-                Text="Click me" 
+                Text="Search Stops" 
                 SemanticProperties.Hint="Counts the number of times you click"
-                Clicked="OnCounterClicked"
+                Clicked="OnSearch"
                 HorizontalOptions="Fill" />
+            <ListView x:Name="BusListView">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextCell Text="{Binding attributes.name}" Detail="{Binding id}" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
         </VerticalStackLayout>
     </ScrollView>
 
