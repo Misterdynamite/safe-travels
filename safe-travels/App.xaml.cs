@@ -15,7 +15,11 @@ public partial class App : Application
     protected override Window CreateWindow(IActivationState? activationState)
     {
         // Set the root page here instead of using MainPage
+<<<<<<< Updated upstream
         return new Window(new MainPage());
+=======
+        return new Window(new BusDetailPage());
+>>>>>>> Stashed changes
     }
 
   

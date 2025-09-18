@@ -62,6 +62,7 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
+<<<<<<< Updated upstream
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
 
@@ -69,9 +70,15 @@
 	  <Compile Update="Views\MapPage.xaml.cs">
 	    <DependentUpon>MapPage.xaml</DependentUpon>
 	  </Compile>
+=======
+		<PackageReference Include="Microsoft.Maui.Controls.Maps" Version="9.0.110" />
+>>>>>>> Stashed changes
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Views\BusDetailPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\JourneyPlannerPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
