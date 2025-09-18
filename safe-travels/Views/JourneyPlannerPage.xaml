@@ -1,12 +1,113 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="safe_travels.Views.JourneyPlannerPage"
-             Title="JourneyPlannerPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:maps="clr-namespace:Microsoft.Maui.Controls.Maps;assembly=Microsoft.Maui.Controls.Maps"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="safe_travels.Views.JourneyPlannerPage"
+    Title="Journey Planner">
+    <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="White">
+        <maps:Map />
+        <!-- 🔹 Top App Bar -->
+        <Grid BackgroundColor="#F8F8F8" Padding="10" Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Hamburger Menu -->
+            <ImageButton Source="menu.png"
+                         WidthRequest="24" HeightRequest="24"
+                         BackgroundColor="Transparent"
+                         Grid.Column="0"/>
+
+            <!-- Title -->
+            <Label Text="Label"
+                   FontSize="20"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   Grid.Column="1"/>
+
+            <!-- Profile -->
+            <ImageButton Source="profile.png"
+                         WidthRequest="32" HeightRequest="32"
+                         CornerRadius="16"
+                         BackgroundColor="LightGray"
+                         Grid.Column="2"/>
+        </Grid>
+
+        <!-- 🔹 Main Content -->
+        <ScrollView Grid.Row="1" Padding="15">
+            <VerticalStackLayout Spacing="15">
+
+                <!-- Search Bar -->
+                <SearchBar Placeholder="Enter stop number or location..."
+                           BackgroundColor="#EFEFEF"
+                           TextColor="Black"
+                           PlaceholderColor="Gray"/>
+
+                <!-- Journey Section -->
+                <Label Text="YOUR JOURNEY" FontSize="18" FontAttributes="Bold"/>
+                <Label Text="Choose your journey" FontSize="14" TextColor="Gray"/>
+
+                <CollectionView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Stroke="#DDD" StrokeThickness="1" StrokeShape="RoundRectangle 12" Margin="0,5">
+                                <HorizontalStackLayout Padding="10" Spacing="10">
+                                    <Frame WidthRequest="30" HeightRequest="30" CornerRadius="15" BackgroundColor="#B49BEB" HasShadow="False" VerticalOptions="Center">
+                                        <Label Text="A" HorizontalOptions="Center" VerticalOptions="Center" TextColor="White"/>
+                                    </Frame>
+                                    <Label Text="{Binding .}" VerticalOptions="Center"/>
+                                </HorizontalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+
+                    <!-- Example static data -->
+                    <CollectionView.ItemsSource>
+                        <x:Array Type="{x:Type x:String}">
+                            <x:String>Bus #1 to walking 30m to Bus #2 to point B</x:String>
+                            <x:String>Bus #1 to Bus #3 to walking 500m to point B</x:String>
+                            <x:String>Bus #1 to Bus #3 to point B</x:String>
+                        </x:Array>
+                    </CollectionView.ItemsSource>
+                </CollectionView>
+
+                <!-- Cancel / Select Buttons -->
+                <HorizontalStackLayout Spacing="20" HorizontalOptions="End">
+                    <Button Text="Cancel" BackgroundColor="Transparent" TextColor="Gray"/>
+                    <Button Text="Select" BackgroundColor="#B49BEB" TextColor="White" CornerRadius="20"/>
+                </HorizontalStackLayout>
+
+                <!-- ETA Section -->
+                <Border Stroke="#DDD" StrokeThickness="1" StrokeShape="RoundRectangle 20" Padding="15" BackgroundColor="#F9F9F9">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="YOUR BUS TO (LOCATION) ARRIVES IN: 6:07s" FontSize="14" TextColor="Black"/>
+                        <HorizontalStackLayout Spacing="15" HorizontalOptions="Center">
+                            <Button Text="HIDE" WidthRequest="100" BackgroundColor="#E0E0E0" TextColor="Black" CornerRadius="20"/>
+                            <Button Text="OPEN" WidthRequest="100" BackgroundColor="#B49BEB" TextColor="White" CornerRadius="20"/>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- 🔹 Bottom Navigation -->
+        <Grid Grid.Row="2" BackgroundColor="White" Padding="10" ColumnDefinitions="*,*,*">
+            <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center">
+                <Image Source="planner.png" HeightRequest="24"/>
+                <Label Text="Journey Planner" FontSize="12" HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+            <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center">
+                <Image Source="live.png" HeightRequest="24"/>
+                <Label Text="Live Tracking" FontSize="12" HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+            <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center">
+                <Image Source="saved.png" HeightRequest="24"/>
+                <Label Text="Saved Journeys" FontSize="12" HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+        </Grid>
+    </Grid>
 </ContentPage>

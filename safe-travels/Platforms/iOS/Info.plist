@@ -28,5 +28,9 @@
 	</array>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/appicon.appiconset</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Application needs access to location always.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Application  needs to access location when app in use.</string>
 </dict>
 </plist>

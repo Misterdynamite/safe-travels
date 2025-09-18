@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="safe_travels.Views.BusDetailPage"
+             Title="Bus Stop">
+
+    <VerticalStackLayout Padding="20" Spacing="16">
+
+        <Frame BackgroundColor="#f2f2f2" CornerRadius="12" Padding="16">
+            <VerticalStackLayout>
+                <Label Text="Fort street"
+                       FontSize="24"
+                       FontAttributes="Bold"/>
+                <Label Text="Stop ID: 6741"
+                       FontSize="14"
+                       TextColor="Gray"/>
+            </VerticalStackLayout>
+        </Frame>
+
+        <Label Text="Upcoming Buses" FontSize="18" FontAttributes="Bold"/>
+
+        <CollectionView>
+            <CollectionView.ItemsSource>
+                <x:Array Type="{x:Type x:String}">
+                    <x:String>Route 27 — 5 mins</x:String>
+                    <x:String>Route 15 — 12 mins</x:String>
+                    <x:String>Route 42 — 20 mins</x:String>
+                </x:Array>
+            </CollectionView.ItemsSource>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame BackgroundColor="White" CornerRadius="8" Margin="0,4" Padding="12">
+                        <Label Text="{Binding .}" FontSize="16"/>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button Text="View Map" 
+                HeightRequest="50"
+                BackgroundColor="#6200EE" 
+                TextColor="White"
+                CornerRadius="8"
+                Clicked="OnMapButtonClicked"/>
+    </VerticalStackLayout>
+</ContentPage>
