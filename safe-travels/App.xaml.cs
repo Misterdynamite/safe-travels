@@ -1,5 +1,6 @@
 ﻿namespace safe_travels;
 using Microsoft.Maui;
+using safe_travels.API.AucklandTransportAPI;
 using safe_travels.Views;
 
 
@@ -16,4 +17,6 @@ public partial class App : Application
         // Set the root page here instead of using MainPage
         return new Window(new MainPage());
     }
+
+  
 }

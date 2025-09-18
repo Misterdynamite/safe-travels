@@ -30,5 +30,28 @@ namespace safe_travels.API.AucklandTransportAPI
             StopData selectedStop = stops[0];
             Debug.WriteLine($"Selected stop: {selectedStop.attributes.stopName} (ID: {selectedStop.attributes.stopId})");
         }
+
+
+        public async Task DemoTripIdData(string tripId)
+        {
+            //use stopId to get trip data
+            TripCalls tripCaller = new TripCalls();
+            List<TripData> trips = await tripCaller.GetTripbyTripIDMatch(tripId);
+
+            if (trips == null || trips.Count == 0)
+            {
+                Debug.WriteLine("No trips found for trip ID: " + tripId);
+                return;
+            }
+
+            for ( int i = 0; i < trips.Count; i++)
+            {
+                TripData trip = trips[i];
+                Debug.WriteLine($"{i + 1}. Trip ID: {trip.id}, Route ID: {trip.attributes.routeId}, Start Time: {trip.attributes.tripStartTime}, Buss HeadSign: {trip.attributes.stopHeadsign} ");
+            }
+            TripData selectedTrip = trips[0];
+            Debug.WriteLine($"Selected Trip ID: {selectedTrip.id}, Route ID: {selectedTrip.attributes.routeId}, Start Time: {selectedTrip.attributes.tripStartTime}, Buss HeadSign: {selectedTrip.attributes.stopHeadsign} ");
+
+        }
     }
 }
