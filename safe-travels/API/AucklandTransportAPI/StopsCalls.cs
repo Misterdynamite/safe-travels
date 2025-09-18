@@ -144,7 +144,7 @@ namespace safe_travels.API.AucklandTransportAPI
 
         /// <summary>
         /// Gets or sets the latitude of the stop.
-        /// </summary>
+        /// </summary>  
         public double stopLat { get; set; }
 
         /// <summary>
