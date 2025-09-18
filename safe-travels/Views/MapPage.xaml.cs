@@ -1,9 +1,13 @@
 namespace safe_travels.Views;
 
-public partial class NewPage1 : ContentPage
+public partial class MapPage : ContentPage
 {
-	public NewPage1()
+	public MapPage()
 	{
 		InitializeComponent();
 	}
+    private async void OnBackButtonClicked(object sender, EventArgs e)
+    {
+        await Navigation.PopAsync();
+    }
 }
