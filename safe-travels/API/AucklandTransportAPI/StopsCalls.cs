@@ -114,17 +114,17 @@ namespace safe_travels.API.AucklandTransportAPI
         /// <summary>
         /// Gets or sets the type of the stop.
         /// </summary>
-        public string type { get; set; }
+        public required string type { get; set; }
 
         /// <summary>
         /// Gets or sets the unique identifier of the stop.
         /// </summary>
-        public string id { get; set; }
+        public required string id { get; set; }
 
         /// <summary>
         /// Gets or sets the attributes of the stop.
         /// </summary>
-        public StopAttributes attributes { get; set; }
+        public required StopAttributes attributes { get; set; }
     }
 
     /// <summary>
@@ -135,12 +135,12 @@ namespace safe_travels.API.AucklandTransportAPI
         /// <summary>
         /// Gets or sets the stop ID.
         /// </summary>
-        public string stopId { get; set; }
+        public required string stopId { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the stop.
         /// </summary>
-        public string stopName { get; set; }
+        public required string stopName { get; set; }
 
         /// <summary>
         /// Gets or sets the latitude of the stop.
