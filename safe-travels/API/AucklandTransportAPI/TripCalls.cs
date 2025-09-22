@@ -25,7 +25,7 @@ namespace safe_travels.API.AucklandTransportAPI
         /// <summary>
         /// Retrieves a list of stops whose names contain the specified input string.
         /// </summary>
-        /// <param name="tripId">The partial or full name of the stop to search for.</param>
+        /// <param name="tripIdInput">The partial or full name of the stop to search for.</param>
         /// <returns>A list of <see cref="StopData"/> objects matching the search criteria.</returns>
         public async Task<List<TripData>> GetTripbyTripIDMatch(string tripIdInput)
         {
