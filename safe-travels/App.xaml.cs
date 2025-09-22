@@ -16,7 +16,7 @@ public partial class App : Application
     {
         // Set the root page here instead of using MainPage
 
-        return new Window(new BusDetailPage());
+        return new Window(new MapPage());
 
 
     }

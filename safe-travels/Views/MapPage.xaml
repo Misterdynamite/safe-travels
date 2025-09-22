@@ -7,7 +7,7 @@
 
     <Grid>
         <!-- Actual Map -->
-        <maps:Map x:Name="BusMap"
+        <maps:Map x:Name="StopMap"
                   MapType="Street"
                   IsShowingUser="True" />
 
