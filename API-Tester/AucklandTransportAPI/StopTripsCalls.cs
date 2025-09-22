@@ -6,14 +6,31 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace AucklandTransportAPI
+namespace safe_travels.API.AucklandTransportAPI
 {
+    /// <summary>
+    /// Provides methods to interact with the Auckland Transport API for retrieving trip information by stop ID.
+    /// </summary>
     class StopTripsCalls
     {
+        /// <summary>
+        /// The base URL template for the Auckland Transport stop trips API.
+        /// </summary>
         private static readonly string apiURL = "https://api.at.govt.nz/gtfs/v3/stops/{id}/stoptrips?filter[date]={filter[date]}&filter[start_hour]={filter[start_hour]}[&filter[hour_range]]";
 
+        /// <summary>
+        /// The subscription key required for authenticating requests to the Auckland Transport API.
+        /// </summary>
         private static readonly string subscriptionKey = "25c926c6234a49c98d52d90a8bd7ac7e";
 
+        /// <summary>
+        /// Retrieves a list of trips for a specified stop ID from the Auckland Transport API.
+        /// </summary>
+        /// <param name="stopIdInput">The stop ID to query trips for.</param>
+        /// <returns>
+        /// A list of <see cref="TripStopResponse"/> objects containing trip data for the specified stop ID.
+        /// Returns an empty list if no trips are found or an error occurs.
+        /// </returns>
         public async Task<List<TripStopResponse>> GetTripsByStopID(string stopIdInput)
         {
             try
@@ -22,12 +39,10 @@ namespace AucklandTransportAPI
                 client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
                 client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", subscriptionKey);
 
-                var url = $"https://api.at.govt.nz/gtfs/v3/stops/{stopIdInput}/stoptrips" +
-                          $"?filter[date]={DateTime.Now:yyyy-MM-dd}" +
-                          $"&filter[start_hour]={DateTime.Now.Hour}" +
-                          $"&filter[hour_range]=3";
-                System.Diagnostics.Debug.WriteLine($"Fetching trips for stop ID {stopIdInput} from URL: {url}");
-
+                var url = apiURL
+                    .Replace("{id}", stopIdInput)
+                    .Replace("{filter[date]}", DateTime.Now.ToString("yyyy-MM-dd"))
+                    .Replace("{filter[start_hour]}", DateTime.Now.Hour.ToString());
 
                 var response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
@@ -94,54 +109,109 @@ namespace AucklandTransportAPI
                 return new List<TripStopResponse>();
             }
         }
+    }
 
-              
+    /// <summary>
+    /// Represents a response containing trip stop data from the Auckland Transport API.
+    /// </summary>
+    public class TripStopResponse
+    {
+        /// <summary>
+        /// Gets or sets the list of trip stop data.
+        /// </summary>
+        public required List<TripStopData> data { get; set; }
+    }
 
+    /// <summary>
+    /// Represents the data for a specific trip stop.
+    /// </summary>
+    public class TripStopData
+    {
+        /// <summary>
+        /// Gets or sets the type of the trip stop.
+        /// </summary>
+        public required string type { get; set; }
 
+        /// <summary>
+        /// Gets or sets the unique identifier for the trip stop.
+        /// </summary>
+        public required string id { get; set; }
 
+        /// <summary>
+        /// Gets or sets the attributes associated with the trip stop.
+        /// </summary>
+        public required TripStopAttributes attributes { get; set; }
+    }
 
-public class TripStopResponse
-        {
-            public List<TripStopData> data { get; set; }
-        }
+    /// <summary>
+    /// Represents the attributes of a trip stop, including timing and route information.
+    /// </summary>
+    public class TripStopAttributes
+    {
+        /// <summary>
+        /// Gets or sets the arrival time at the stop.
+        /// </summary>
+        public required string arrivalTime { get; set; }
 
-        public class TripStopData
-        {
-            public string type { get; set; }
-            public string id { get; set; }
-            public TripStopAttributes attributes { get; set; }
-        }
-        public class TripStopAttributes
-        {
+        /// <summary>
+        /// Gets or sets the departure time from the stop.
+        /// </summary>
+        public required string departureTime { get; set; }
 
-            public string arrivalTime { get; set; }
-            public string departureTime { get; set; }
-            public int directionId { get; set; }
+        /// <summary>
+        /// Gets or sets the direction ID for the trip.
+        /// </summary>
+        public int directionId { get; set; }
 
-            public int dropOffType { get; set; }
+        /// <summary>
+        /// Gets or sets the drop-off type for the stop.
+        /// </summary>
+        public int dropOffType { get; set; }
 
-            public int pickupType { get; set; }
+        /// <summary>
+        /// Gets or sets the pickup type for the stop.
+        /// </summary>
+        public int pickupType { get; set; }
 
-            public string routeId { get; set; }
+        /// <summary>
+        /// Gets or sets the route ID for the trip.
+        /// </summary>
+        public required string routeId { get; set; }
 
-            public string serviceDate { get; set; }
+        /// <summary>
+        /// Gets or sets the service date for the trip.
+        /// </summary>
+        public required string serviceDate { get; set; }
 
-            public string shapeId { get; set; }
+        /// <summary>
+        /// Gets or sets the shape ID for the trip.
+        /// </summary>
+        public required string shapeId { get; set; }
 
-            public string stopHeadSign { get; set; }
+        /// <summary>
+        /// Gets or sets the head sign for the stop.
+        /// </summary>
+        public required string stopHeadSign { get; set; }
 
-            public string stopId { get; set; }
+        /// <summary>
+        /// Gets or sets the stop ID.
+        /// </summary>
+        public required string stopId { get; set; }
 
-            public int stopSequence { get; set; }
+        /// <summary>
+        /// Gets or sets the sequence number of the stop in the trip.
+        /// </summary>
+        public int stopSequence { get; set; }
 
-            public string tripId { get; set; }
+        /// <summary>
+        /// Gets or sets the trip ID.
+        /// </summary>
+        public required string tripId { get; set; }
 
-            public string tripStartTime { get; set; }
-
-
-
-
-        }
+        /// <summary>
+        /// Gets or sets the start time of the trip.
+        /// </summary>
+        public required string tripStartTime { get; set; }
     }
 }
 

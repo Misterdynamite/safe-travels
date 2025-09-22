@@ -63,13 +63,42 @@ public partial class MapPage : ContentPage
                     // Add pins to the map for each stop
                     var pin = new Pin
                     {
-                        Label = stop.attributes.stopName,
-                        Location = new Location(stop.attributes.stopLat, stop.attributes.stopLong),
-                        Type = PinType.Place
+                        Label = stop.stopName,
+                        Location = new Location(stop.stopLat, stop.stopLong),
+                        Type = PinType.Place,
+                        BindingContext = stop // Store the Stop object here
                     };
                     StopMap.Pins.Add(pin);
+
+                    // Attach a handler to the pin's MarkerClicked event
+                    pin.MarkerClicked += async (s, args) =>
+                    {
+                        if (s is Pin clickedPin && clickedPin.BindingContext is Stop clickedStop)
+                        {
+                            // Get bus details using StopTripCalls
+                            var stopTripCalls = new StopTripsCalls();
+                            List<TripStopResponse> busDetails = await stopTripCalls.GetTripsByStopID(clickedStop.stopId);
+                            System.Diagnostics.Debug.WriteLine($"Bus details for stop {clickedStop.stopName} (ID: {clickedStop.stopId}): {busDetails.Count} trips found.");
+
+                            // Navigate to BusDetailPage, passing busDetails
+                            // Pass busDetails, stopName, and stopId to BusDetailPage constructor
+                            if (Application.Current?.MainPage is NavigationPage navigationPage)
+                            {
+                                await navigationPage.Navigation.PushAsync(new BusDetailPage(busDetails, clickedStop.stopName, clickedStop.stopId));
+                            }
+                            else if (Navigation != null)
+                            {
+                                await Navigation.PushAsync(new BusDetailPage(busDetails, clickedStop.stopName, clickedStop.stopId));
+                            }
+                            else
+                            {
+                                await DisplayAlert("Navigation Error", "Navigation is not available. Please ensure this page is within a NavigationPage.", "OK");
+                            }
+                        }
+                    };
                 }
             }
+
             else
             {
                 await DisplayAlert("No Stops Found", "No stops found for 'Constellation'.", "OK");
@@ -84,5 +113,13 @@ public partial class MapPage : ContentPage
     private async void OnBackButtonClicked(object sender, EventArgs e)
     {
         await Navigation.PopAsync();
+    }
+
+    private void OnMarkerClicked(object sender, PinClickedEventArgs e)
+    {
+        if (sender is Pin pin && pin.MarkerId is string stopId)
+        {
+            Console.WriteLine($"StopID: {stopId}");
+        }
     }
 }

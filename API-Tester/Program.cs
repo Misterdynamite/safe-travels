@@ -1,17 +1,23 @@
-﻿using System;
+﻿using safe_travels.API.AucklandTransportAPI;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using AucklandTransportAPI;
 
-class Program
+namespace AucklandTransportAPI
 {
-    static async Task Main(string[] args)
+    class Program
     {
-        var stopsCalls = new StopsCalls();
-        var results = await stopsCalls.GetStopsByName("Torbay Shops");
-        StopData firstResult = results[0];
-        Console.WriteLine($"Found {results.Count} stops matching 'Torbay'. First stop ID: {firstResult.attributes.stopId}, Name: {firstResult.attributes.stopName}");
-        var stopTripCalls = new StopTripsCalls();
-        var tripResults = await stopTripCalls.GetTripsByStopID(firstResult.attributes.stopId);
-        Console.WriteLine($"Found {tripResults.Count} trips for stop {firstResult.attributes.stopName}");
+        static async Task Main(string[] args)
+        {
+            var stopsCalls = new StopsCalls();
+            var results = await stopsCalls.GetStopsByName("Constellation Bus Station");
+            Stop firstResult = results[0];
+            Console.WriteLine($"Found {results.Count} stops matching 'Torbay'. First stop ID: {firstResult.stopId}, Name: {firstResult.stopName}");
+            
+            
+            var stopTripCalls = new StopTripsCalls();
+            var tripResults = await stopTripCalls.GetTripsByStopID(firstResult.stopId);
+            Console.WriteLine($"Found {tripResults.Count} trips for stop {firstResult.stopName}");
+        }
     }
 }

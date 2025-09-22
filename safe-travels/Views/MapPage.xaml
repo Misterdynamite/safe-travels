@@ -9,7 +9,8 @@
         <!-- Actual Map -->
         <maps:Map x:Name="StopMap"
                   MapType="Street"
-                  IsShowingUser="True" />
+                  IsShowingUser="True"
+                  />
 
         <!-- Back Button -->
         <Button Text="Back to Bus Stop" 

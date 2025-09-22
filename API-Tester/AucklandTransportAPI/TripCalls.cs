@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace AucklandTransportAPI
+namespace safe_travels.API.AucklandTransportAPI
 {
     class TripCalls
     {
@@ -25,7 +25,7 @@ namespace AucklandTransportAPI
         /// <summary>
         /// Retrieves a list of stops whose names contain the specified input string.
         /// </summary>
-        /// <param name="tripId">The partial or full name of the stop to search for.</param>
+        /// <param name="tripIdInput">The partial or full name of the stop to search for.</param>
         /// <returns>A list of <see cref="StopData"/> objects matching the search criteria.</returns>
         public async Task<List<TripData>> GetTripbyTripIDMatch(string tripIdInput)
         {
@@ -110,23 +110,22 @@ namespace AucklandTransportAPI
     }
 
   
-    public class  TripData
+    public class TripData
     {
-        public string type { get; set; }
-        public string id { get; set; }
-        public TripAttributes attributes { get; set; }
-
+        public string type { get; set; } = string.Empty;
+        public string id { get; set; } = string.Empty;
+        public TripAttributes attributes { get; set; } = new TripAttributes();
     }
-    public class  TripAttributes 
-    {
-        public string tripId { get; set; }
-        public string tripHeadsign { get; set; }
-        public string tripStartTime { get; set; }
-        public string routeId { get; set; }
-        public string serviceDate { get; set; }
-        public string stopHeadsign { get; set; }
-        public int directionId { get; set; }
-        public string shapeId { get; set; }
 
+    public class TripAttributes
+    {
+        public string tripId { get; set; } = string.Empty;
+        public string tripHeadsign { get; set; } = string.Empty;
+        public string tripStartTime { get; set; } = string.Empty;
+        public string routeId { get; set; } = string.Empty;
+        public string serviceDate { get; set; } = string.Empty;
+        public string stopHeadsign { get; set; } = string.Empty;
+        public int directionId { get; set; }
+        public string shapeId { get; set; } = string.Empty;
     }
 }

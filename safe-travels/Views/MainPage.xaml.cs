@@ -28,7 +28,7 @@ namespace safe_travels
             try
             {
                 // Fetch data
-                List<StopData> data = await aTAPIDEMO.GetStopsByName(searchText);
+                List<Stop> data = await aTAPIDEMO.GetStopsByName(searchText);
                 // Bind the data to ListView
                 BusListView.ItemsSource = data;
             }

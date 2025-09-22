@@ -5,30 +5,31 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 
-namespace AucklandTransportAPI
+namespace safe_travels.API.AucklandTransportAPI
 {
     internal class MasterCaller
     {
-        public async Task DemoStopToTripFlow(string stopNameInput)
+        public async Task<List<Stop>> DemoStopToTripFlow(string stopNameInput)
         {
             StopsCalls stopsCaller = new StopsCalls();
-            List<StopData> stops = await stopsCaller.GetStopsByName(stopNameInput);
+            List<Stop> stops = await stopsCaller.GetStopsByName(stopNameInput);
 
             if (stops == null || stops.Count == 0)
             {
                 Debug.WriteLine("No stops found for input: " + stopNameInput);
-                return;
+                return stops;
             }
 
             for (int i = 0; i < stops.Count; i++)
             {
-                StopData stop = stops[i];
-                Debug.WriteLine($"{i + 1}. {stop.attributes.stopName} (ID: {stop.attributes.stopId})");
+                Stop stop = stops[i];
+                Debug.WriteLine($"{i + 1}. {stop.stopName} (ID: {stop.stopId})");
             }
 
             // picks first stop bc search button doesnt exist yet
-            StopData selectedStop = stops[0];
-            Debug.WriteLine($"Selected stop: {selectedStop.attributes.stopName} (ID: {selectedStop.attributes.stopId})");
+            Stop selectedStop = stops[0];
+            Debug.WriteLine($"Selected stop: {selectedStop.stopName} (ID: {selectedStop.stopId})");
+            return stops;
         }
 
 

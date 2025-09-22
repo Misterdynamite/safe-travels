@@ -35,16 +35,23 @@ namespace safe_travels.API.AucklandTransportAPI
         {
             try
             {
+                var baseUrl = $"https://api.at.govt.nz/gtfs/v3/stops/{stopIdInput}/stoptrips";
+                var queryParams = new Dictionary<string, string>
+                {
+                    ["filter[date]"] = DateTime.Now.ToString("yyyy-MM-dd"),
+                    ["filter[start_hour]"] = DateTime.Now.Hour.ToString(),
+                    ["filter[hour_range]"] = "3"
+                };
+
+                var uriBuilder = new UriBuilder(baseUrl);
+                var query = string.Join("&", queryParams.Select(kvp => $"{kvp.Key}={Uri.EscapeDataString(kvp.Value)}"));
+                uriBuilder.Query = query;
+
                 using var client = new HttpClient();
                 client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
                 client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", subscriptionKey);
 
-                var url = apiURL
-                    .Replace("{id}", stopIdInput)
-                    .Replace("{filter[date]}", DateTime.Now.ToString("yyyy-MM-dd"))
-                    .Replace("{filter[start_hour]}", DateTime.Now.Hour.ToString());
-
-                var response = await client.GetAsync(url);
+                var response = await client.GetAsync(uriBuilder.Uri);
                 response.EnsureSuccessStatusCode();
                 var content = await response.Content.ReadAsStringAsync();
 

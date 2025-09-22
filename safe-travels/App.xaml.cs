@@ -9,15 +9,8 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
-        // Removed obsolete MainPage assignment
+
+        // Wrap your starting page in a NavigationPage
+        MainPage = new NavigationPage(new MapPage());
     }
-
-    protected override Window CreateWindow(IActivationState? activationState)
-    {
-        // Set the root page here instead of using MainPage
-
-        return new Window(new MapPage());
-
-
-    }
-    }
+}
