@@ -6,21 +6,9 @@
              Title="Map">
 
     <Grid>
-        <!-- Actual Map -->
         <maps:Map x:Name="StopMap"
                   MapType="Street"
                   IsShowingUser="True"
                   />
-
-        <!-- Back Button -->
-        <Button Text="Back to Bus Stop" 
-                BackgroundColor="#6200EE"
-                TextColor="White"
-                CornerRadius="8"
-                HeightRequest="50"
-                HorizontalOptions="Center"
-                VerticalOptions="End"
-                Margin="20"
-                Clicked="OnBackButtonClicked"/>
     </Grid>
 </ContentPage>

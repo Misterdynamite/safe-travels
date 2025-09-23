@@ -3,10 +3,24 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="safe_travels.Views.BusDetailPage"
              Title="Bus Stop">
-
-    <VerticalStackLayout Padding="20" Spacing="16">
-
-        <Border Background="#f2f2f2" StrokeShape="RoundRectangle 12" Padding="16">
+            
+    <VerticalStackLayout Padding="20" Spacing="8">
+        <SearchBar x:Name="TripSearchBar"
+                   Placeholder="Search buses..."
+                   TextChanged="OnSearchTextChanged"
+                   HorizontalOptions="CenterAndExpand" />
+        <Picker x:Name="FilterPicker"
+                Title="Filter trips"
+                HorizontalOptions="FillAndExpand">
+            <Picker.Items>
+                <x:String>All</x:String>
+                <x:String>Arriving Soon</x:String>
+                <x:String>Favorites</x:String>
+            </Picker.Items>
+        </Picker>
+        <HorizontalStackLayout Spacing="10">
+        </HorizontalStackLayout>
+        <Border Background="#f2f2f2" StrokeShape="RoundRectangle 12" Padding="23">
             <VerticalStackLayout>
                 <Label Text="{Binding StopName}"
                        FontSize="24"
@@ -19,7 +33,8 @@
 
         <Label Text="Upcoming Buses" FontSize="18" FontAttributes="Bold"/>
 
-        <CollectionView ItemsSource="{Binding Trips}">
+        <CollectionView x:Name="BusCollection"
+                ItemsSource="{Binding Trips}">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Border Background="White" StrokeShape="RoundRectangle 8" Margin="0,4" Padding="12">

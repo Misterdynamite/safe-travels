@@ -18,7 +18,7 @@ public partial class BusDetailPage : ContentPage
 
     }
     
-    public async Task filterBusses(string stopHeadsign)
+    public async Task FilterBusses(string stopHeadsign)
     {
         //cast bindingcontext ot a dynamic to access trips
         var context = (dynamic)BindingContext;
@@ -31,8 +31,13 @@ public partial class BusDetailPage : ContentPage
         var filtered = string.IsNullOrEmpty(stopHeadsign)
             ? trips
             : trips.Where(bus => bus.attributes != null && bus.attributes.stopHeadsign == stopHeadsign).ToList();
+            
+        BusCollection.ItemsSource = filtered;
     }
-
+    private async void OnSearchTextChanged(object sender, TextChangedEventArgs e)
+    {
+        await FilterBusses(e.NewTextValue);
+    }
 
     public async Task departureNotification(string departureTime)
     {
@@ -55,9 +60,11 @@ public partial class BusDetailPage : ContentPage
         await DisplayAlert("Reminder", $"Your bus departs at {departureTime} in 10 minutes.", "OK");
 
     }
-        
-        
+
     
+
+
+
 
 
     //private async void OnMapButtonClicked(object sender, EventArgs e)
