@@ -9,8 +9,9 @@ public partial class MapPage : ContentPage
     public MapPage()
     {
         InitializeComponent();
-        LoadDefaultStops(this, EventArgs.Empty);
         SetMapToCurrentLocationAsync();
+
+        LoadDefaultStops(this, EventArgs.Empty);
     }
 
     private async void SetMapToCurrentLocationAsync()
@@ -53,8 +54,7 @@ public partial class MapPage : ContentPage
         {
             // Assuming you have a MasterCaller instance available
             var masterCaller = new MasterCaller();
-            // Call DemoStopToTripFlow to get stops by name "Constellation"
-            var stops = await masterCaller.DemoStopToTripFlow("Constellation");
+            var stops = await masterCaller.DemoStopToTripFlow("Albany");
 
             if (stops != null && stops.Any())
             {
@@ -78,7 +78,6 @@ public partial class MapPage : ContentPage
                             // Get bus details using StopTripCalls
                             var stopTripCalls = new StopTripsCalls();
                             List<TripStopResponse> busDetails = await stopTripCalls.GetTripsByStopID(clickedStop.stopId);
-                            System.Diagnostics.Debug.WriteLine($"Bus details for stop {clickedStop.stopName} (ID: {clickedStop.stopId}): {busDetails.Count} trips found.");
 
                             // Navigate to BusDetailPage, passing busDetails
                             // Pass busDetails, stopName, and stopId to BusDetailPage constructor

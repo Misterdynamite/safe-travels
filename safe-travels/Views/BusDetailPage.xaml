@@ -40,6 +40,7 @@
                     <Border Background="White" StrokeShape="RoundRectangle 8" Margin="0,4" Padding="12">
                         <VerticalStackLayout>
                             <Label Text="{Binding attributes.stopHeadSign}" FontSize="16"/>
+                            <Label Text="{Binding attributes.routeId}" FontSize="16"/>
                             <Label Text="{Binding attributes.arrivalTime}" FontSize="14" TextColor="Gray"/>
                         </VerticalStackLayout>
                     </Border>

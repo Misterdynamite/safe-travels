@@ -27,11 +27,15 @@ public partial class BusDetailPage : ContentPage
         if (trips == null)
             return;
 
-        // filter by headsign using the correct property path
+        // filter by headsign using a case-insensitive partial match
         var filtered = string.IsNullOrEmpty(stopHeadsign)
             ? trips
-            : trips.Where(bus => bus.attributes != null && bus.attributes.stopHeadSign == stopHeadsign).ToList();
-            
+            : trips.Where(bus =>
+                bus.attributes != null &&
+                !string.IsNullOrEmpty(bus.attributes.stopHeadSign) &&
+                bus.attributes.stopHeadSign.Contains(stopHeadsign, StringComparison.OrdinalIgnoreCase)
+            ).ToList();
+
         BusCollection.ItemsSource = filtered;
     }
 
