@@ -5,10 +5,31 @@
              x:Class="safe_travels.Views.MapPage"
              Title="Map">
 
-    <Grid>
+    <Grid RowDefinitions="*,80">
+        <!-- Map fills most of the screen -->
         <maps:Map x:Name="StopMap"
                   MapType="Street"
                   IsShowingUser="True"
-                  />
+                  Grid.Row="0" />
+
+        <!-- Horizontal list of favorite stops at the bottom -->
+        <CollectionView x:Name="FavoriteStopsCollection"
+                        ItemsLayout="HorizontalList"
+                        SelectionMode="Single"
+                        HeightRequest="80"
+                        Margin="10"
+                        SelectionChanged="OnFavoriteStopSelected"
+                        Grid.Row="1">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Background="#e0f7fa" StrokeShape="RoundRectangle 8" Margin="4" Padding="8">
+                        <VerticalStackLayout>
+                            <Label Text="{Binding stopName}" FontSize="16" FontAttributes="Bold"/>
+                            <Label Text="{Binding stopId}" FontSize="12" TextColor="Gray"/>
+                        </VerticalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
     </Grid>
 </ContentPage>

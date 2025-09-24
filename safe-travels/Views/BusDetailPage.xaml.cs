@@ -1,4 +1,5 @@
 using safe_travels.API.AucklandTransportAPI;
+using safe_travels.Utilities;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
@@ -6,9 +7,14 @@ namespace safe_travels.Views;
 
 public partial class BusDetailPage : ContentPage
 {
+    private string _stopName;
+    private string _stopId;
+
     public BusDetailPage(List<TripStopResponse> trips, string stopName, string stopId)
     {
         InitializeComponent();
+        _stopName = stopName;
+        _stopId = stopId;
         BindingContext = new
         {
             StopName = stopName,
@@ -18,6 +24,21 @@ public partial class BusDetailPage : ContentPage
 
     }
     
+    private void OnSaveStopClicked(object sender, EventArgs e)
+    {
+        // Create a Stop object and save as favorite
+        var stop = new Stop
+        {
+            stopId = _stopId,
+            stopName = _stopName,
+            id = _stopId, // Assuming id should match stopId
+            type = "stop" // Assuming type is always "stop"
+            // Add other properties if needed
+        };
+        StorageManager.AddFavoriteStop(stop);
+        DisplayAlert("Saved", $"Stop '{_stopName}' saved to favorites.", "OK");
+    }
+
     public async Task FilterBusses(string stopHeadsign)
     {
         //cast bindingcontext ot a dynamic to access trips
@@ -66,12 +87,6 @@ public partial class BusDetailPage : ContentPage
         await DisplayAlert("Reminder", $"Your bus departs at {departureTime} in 10 minutes.", "OK");
 
     }
-
-    
-
-
-
-
 
     //private async void OnMapButtonClicked(object sender, EventArgs e)
     //{

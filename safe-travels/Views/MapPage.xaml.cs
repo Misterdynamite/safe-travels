@@ -2,17 +2,60 @@ using Microsoft.Maui.Controls.Maps;
 using Microsoft.Maui.Devices.Sensors;
 using Microsoft.Maui.Maps;
 using safe_travels.API.AucklandTransportAPI;
+using safe_travels.Utilities;
 
 namespace safe_travels.Views;
 
 public partial class MapPage : ContentPage
 {
+    private List<Stop> _favoriteStops = new();
+
     public MapPage()
     {
         InitializeComponent();
         SetMapToCurrentLocationAsync();
-
         LoadDefaultStops(this, EventArgs.Empty);
+        LoadFavoriteStops();
+    }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        LoadFavoriteStops();
+    }
+
+    private void LoadFavoriteStops()
+    {
+        _favoriteStops = StorageManager.LoadFavoriteStops();
+        FavoriteStopsCollection.ItemsSource = _favoriteStops;
+    }
+
+    private void OnFavoriteStopSelected(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.CurrentSelection?.FirstOrDefault() is Stop selectedStop)
+        {
+            // Get bus details using StopTripCalls
+            var stopTripCalls = new StopTripsCalls();
+            // Fetch trips asynchronously and navigate
+            Device.BeginInvokeOnMainThread(async () =>
+            {
+                var busDetails = await stopTripCalls.GetTripsByStopID(selectedStop.stopId);
+                if (Application.Current?.MainPage is NavigationPage navigationPage)
+                {
+                    await navigationPage.Navigation.PushAsync(new BusDetailPage(busDetails, selectedStop.stopName, selectedStop.stopId));
+                }
+                else if (Navigation != null)
+                {
+                    await Navigation.PushAsync(new BusDetailPage(busDetails, selectedStop.stopName, selectedStop.stopId));
+                }
+                else
+                {
+                    await DisplayAlert("Navigation Error", "Navigation is not available. Please ensure this page is within a NavigationPage.", "OK");
+                }
+            });
+        }
+        // Deselect after navigation
+        FavoriteStopsCollection.SelectedItem = null;
     }
 
     private async void SetMapToCurrentLocationAsync()

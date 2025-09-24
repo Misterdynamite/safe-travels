@@ -19,6 +19,10 @@
             </Picker.Items>
         </Picker>
         <HorizontalStackLayout Spacing="10">
+            <Button x:Name="SaveStopButton"
+                    Text="Save Stop"
+                    Clicked="OnSaveStopClicked"
+                    HorizontalOptions="End" />
         </HorizontalStackLayout>
         <Border Background="#f2f2f2" StrokeShape="RoundRectangle 12" Padding="23">
             <VerticalStackLayout>
