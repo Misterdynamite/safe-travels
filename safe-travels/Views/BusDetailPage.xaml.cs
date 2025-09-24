@@ -22,7 +22,7 @@ public partial class BusDetailPage : ContentPage
     {
         //cast bindingcontext ot a dynamic to access trips
         var context = (dynamic)BindingContext;
-        var trips = (List<TripData>)context.Trips;
+        var trips = (List<TripStopData>)context.Trips;
 
         if (trips == null)
             return;
@@ -30,13 +30,15 @@ public partial class BusDetailPage : ContentPage
         // filter by headsign using the correct property path
         var filtered = string.IsNullOrEmpty(stopHeadsign)
             ? trips
-            : trips.Where(bus => bus.attributes != null && bus.attributes.stopHeadsign == stopHeadsign).ToList();
+            : trips.Where(bus => bus.attributes != null && bus.attributes.stopHeadSign == stopHeadsign).ToList();
             
         BusCollection.ItemsSource = filtered;
     }
+
     private async void OnSearchTextChanged(object sender, TextChangedEventArgs e)
     {
-        await FilterBusses(e.NewTextValue);
+        string input = e.NewTextValue?.Trim();
+        await FilterBusses(input);
     }
 
     public async Task departureNotification(string departureTime)
