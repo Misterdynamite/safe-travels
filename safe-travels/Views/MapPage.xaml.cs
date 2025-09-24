@@ -1,4 +1,5 @@
 using Microsoft.Maui.Controls.Maps;
+using Microsoft.Maui.Devices.Sensors;
 using Microsoft.Maui.Maps;
 using safe_travels.API.AucklandTransportAPI;
 
@@ -24,19 +25,19 @@ public partial class MapPage : ContentPage
                 location = await Geolocation.GetLocationAsync(new GeolocationRequest(GeolocationAccuracy.Medium));
             }
 
-            //if (location != null)
-            //{
-            //    StopMap.MoveToRegion(MapSpan.FromCenterAndRadius(
-            //        new Location(location.Latitude, location.Longitude),
-            //        Distance.FromKilometers(1)));
-            //}
-            //else
-            //{
-                // Default to specified coordinates if location is unavailable
+            if (location != null)
+            {
                 StopMap.MoveToRegion(MapSpan.FromCenterAndRadius(
-                    new Location(-36.75144113475619, 174.7286331813561),
+                    new Location(location.Latitude, location.Longitude),
                     Distance.FromKilometers(1)));
-            //}
+            }
+            else
+            {
+
+                StopMap.MoveToRegion(MapSpan.FromCenterAndRadius(
+                 new Location(-36.75144113475619, 174.7286331813561),
+                 Distance.FromKilometers(1)));
+            }
         }
         catch (Exception ex)
         {
@@ -54,7 +55,16 @@ public partial class MapPage : ContentPage
         {
             // Assuming you have a MasterCaller instance available
             var masterCaller = new MasterCaller();
-            var stops = await masterCaller.DemoStopToTripFlow("Albany");
+            var location = await Geolocation.GetLastKnownLocationAsync();
+            if (location == null)
+            {
+                location = await Geolocation.GetLocationAsync(new GeolocationRequest(GeolocationAccuracy.Medium));
+            }
+            double latitude = location?.Latitude ?? -36.75144113475619;
+            double longitude = location?.Longitude ?? 174.7286331813561;
+
+
+            var stops = await masterCaller.FetchStopsNearUser(latitude, longitude);
 
             if (stops != null && stops.Any())
             {

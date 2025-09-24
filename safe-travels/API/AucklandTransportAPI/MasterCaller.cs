@@ -9,6 +9,22 @@ namespace safe_travels.API.AucklandTransportAPI
 {
     internal class MasterCaller
     {
+
+        public async Task<List<Stop>> FetchStopsNearUser(double lat, double longi)
+        {
+
+            StopsCalls stopsCaller = new StopsCalls();
+            List<Stop> stops = await stopsCaller.GetStopsByProximity(lat, longi, 1000);
+
+
+            for (int i = 0; i < stops.Count; i++)
+            {
+                Stop stop = stops[i];
+                Debug.WriteLine($"{i + 1}. {stop.stopName} (ID: {stop.stopId})");
+            }
+
+            return stops;
+        }
         public async Task<List<Stop>> DemoStopToTripFlow(string stopNameInput)
         {
             StopsCalls stopsCaller = new StopsCalls();
