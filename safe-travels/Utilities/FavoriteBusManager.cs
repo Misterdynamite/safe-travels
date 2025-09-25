@@ -9,7 +9,7 @@ using safe_travels.API.AucklandTransportAPI;
 
 namespace safe_travels.Utilities
 {
-    internal class StorageManager
+    internal class FavoriteBusManager
     {
         private const string FavoriteStopsKey = "favorite_stops";
 
