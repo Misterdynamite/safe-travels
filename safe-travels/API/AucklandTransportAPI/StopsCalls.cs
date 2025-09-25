@@ -16,12 +16,7 @@ namespace safe_travels.API.AucklandTransportAPI
         /// <summary>
         /// The base URL for the Auckland Transport stops API.
         /// </summary>
-        private static readonly string apiURL = "https://api.at.govt.nz/gtfs/v3/stops";
-
-        /// <summary>
-        /// The subscription key required for authenticating API requests.
-        /// </summary>
-        private static readonly string subscriptionKey = "25c926c6234a49c98d52d90a8bd7ac7e";
+        private static readonly string apiURL = "https://rest.kennedys.nz/api/stops";
 
         /// <summary>
         /// Retrieves a list of stops whose names contain the specified input string.
@@ -35,9 +30,10 @@ namespace safe_travels.API.AucklandTransportAPI
                 System.Diagnostics.Debug.WriteLine("Starting API call");
                 using var client = new HttpClient();
                 client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
-                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", subscriptionKey);
 
-                var response = await client.GetAsync(apiURL);
+                // Use the new API with search parameter
+                var requestUrl = $"{apiURL}?search={Uri.EscapeDataString(stopNameInput)}";
+                var response = await client.GetAsync(requestUrl);
                 response.EnsureSuccessStatusCode();
                 var content = await response.Content.ReadAsStringAsync();
 
@@ -46,26 +42,19 @@ namespace safe_travels.API.AucklandTransportAPI
 
                 var matchingStops = new List<Stop>();
 
-                if (root.TryGetProperty("data", out var dataArray))
+                if (root.TryGetProperty("stops", out var stopsArray))
                 {
-                    foreach (var stop in dataArray.EnumerateArray())
+                    foreach (var stop in stopsArray.EnumerateArray())
                     {
-                        var attrs = stop.GetProperty("attributes");
-                        var stopName = attrs.GetProperty("stop_name").GetString();
-
-                        if (!string.IsNullOrEmpty(stopName) &&
-                            stopName.IndexOf(stopNameInput, StringComparison.OrdinalIgnoreCase) >= 0)
+                        matchingStops.Add(new Stop
                         {
-                            matchingStops.Add(new Stop
-                            {
-                                id = stop.GetProperty("id").GetString() ?? string.Empty,
-                                type = stop.GetProperty("type").GetString() ?? string.Empty,
-                                stopId = attrs.GetProperty("stop_id").GetString() ?? string.Empty,
-                                stopName = stopName,
-                                stopLat = attrs.GetProperty("stop_lat").GetDouble(),
-                                stopLong = attrs.GetProperty("stop_lon").GetDouble()
-                            });
-                        }
+                            id = stop.GetProperty("stop_id").GetString() ?? string.Empty,
+                            type = "stop",
+                            stopId = stop.GetProperty("stop_id").GetString() ?? string.Empty,
+                            stopName = stop.GetProperty("stop_name").GetString() ?? string.Empty,
+                            stopLat = stop.GetProperty("stop_lat").GetDouble(),
+                            stopLong = stop.GetProperty("stop_lon").GetDouble()
+                        });
                     }
                 }
 
@@ -93,9 +82,9 @@ namespace safe_travels.API.AucklandTransportAPI
                 System.Diagnostics.Debug.WriteLine("Starting API call for proximity search");
                 using var client = new HttpClient();
                 client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
-                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", subscriptionKey);
 
-                var response = await client.GetAsync(apiURL);
+
+                var response = await client.GetAsync($"{apiURL}?per_page=500");
                 response.EnsureSuccessStatusCode();
                 var content = await response.Content.ReadAsStringAsync();
 
@@ -104,13 +93,12 @@ namespace safe_travels.API.AucklandTransportAPI
 
                 var matchingStops = new List<Stop>();
 
-                if (root.TryGetProperty("data", out var dataArray))
+                if (root.TryGetProperty("stops", out var stopsArray))
                 {
-                    foreach (var stop in dataArray.EnumerateArray())
+                    foreach (var stop in stopsArray.EnumerateArray())
                     {
-                        var attrs = stop.GetProperty("attributes");
-                        var stopLat = attrs.GetProperty("stop_lat").GetDouble();
-                        var stopLon = attrs.GetProperty("stop_lon").GetDouble();
+                        var stopLat = stop.GetProperty("stop_lat").GetDouble();
+                        var stopLon = stop.GetProperty("stop_lon").GetDouble();
 
                         // Calculate distance using Haversine formula
                         double distance = GetDistanceInMeters(latitude, longitude, stopLat, stopLon);
@@ -119,10 +107,10 @@ namespace safe_travels.API.AucklandTransportAPI
                         {
                             matchingStops.Add(new Stop
                             {
-                                id = stop.GetProperty("id").GetString() ?? string.Empty,
-                                type = stop.GetProperty("type").GetString() ?? string.Empty,
-                                stopId = attrs.GetProperty("stop_id").GetString() ?? string.Empty,
-                                stopName = attrs.GetProperty("stop_name").GetString() ?? string.Empty,
+                                id = stop.GetProperty("stop_id").GetString() ?? string.Empty,
+                                type = "stop",
+                                stopId = stop.GetProperty("stop_id").GetString() ?? string.Empty,
+                                stopName = stop.GetProperty("stop_name").GetString() ?? string.Empty,
                                 stopLat = stopLat,
                                 stopLong = stopLon
                             });

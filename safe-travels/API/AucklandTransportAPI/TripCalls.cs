@@ -14,13 +14,7 @@ namespace safe_travels.API.AucklandTransportAPI
         /// <summary>
         /// The base URL for the Auckland Transport stops API.
         /// </summary>
-        private static readonly string apiURL = $"https://api.at.govt.nz/gtfs/v3/trips/";
-
-
-        /// <summary>
-        /// The subscription key required for authenticating API requests.
-        /// </summary>
-        private static readonly string subscriptionKey = "25c926c6234a49c98d52d90a8bd7ac7e";
+        private static readonly string apiURL = $"https://rest.kennedys.nz/api/trips";
 
         /// <summary>
         /// Retrieves a list of stops whose names contain the specified input string.
@@ -37,13 +31,12 @@ namespace safe_travels.API.AucklandTransportAPI
                 // Create a new HttpClient instance to make the HTTP request
                 using var client = new HttpClient();
 
-
                 // Add headers to the request
                 client.DefaultRequestHeaders.Add("Cache-Control", "no-cache"); // Prevent cached responses
-                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", subscriptionKey); // API subscription key
 
-                // Send a GET request to the API
-                var response = await client.GetAsync(apiURL);
+                // Send a GET request to the API with trip_id filter
+                var requestUrl = $"{apiURL}?trip_id={Uri.EscapeDataString(tripIdInput)}";
+                var response = await client.GetAsync(requestUrl);
 
                 // Throw an exception if the response status code is not successful (200-299)
                 response.EnsureSuccessStatusCode();
@@ -51,50 +44,47 @@ namespace safe_travels.API.AucklandTransportAPI
                 // Read the response content as a string
                 var content = await response.Content.ReadAsStringAsync();
 
-
                 // Parse the JSON response into a JsonDocument
                 using var doc = JsonDocument.Parse(content);
                 var root = doc.RootElement; // Get the root element of the JSON
 
-                // List to hold stops that match the input name
+                // List to hold trips that match the input
                 var trips = new List<TripData>();
 
-                // Check if the root JSON object contains a "data" property
-                if (root.TryGetProperty("data", out var dataArray))
+                // Check if the root JSON object contains a "trips" property
+                if (root.TryGetProperty("trips", out var tripsArray))
                 {
-                    foreach (var trip in dataArray.EnumerateArray())
+                    foreach (var trip in tripsArray.EnumerateArray())
                     {
-                        var attrs = trip.GetProperty("attributes");
-                        var tripId = attrs.GetProperty("trip_id").GetString();
+                        var tripId = trip.GetProperty("trip_id").GetString();
 
                         if (!string.IsNullOrEmpty(tripId) &&
                             tripId.IndexOf(tripIdInput, StringComparison.OrdinalIgnoreCase) >= 0)
                         {
                             trips.Add(new TripData
                             {
-                                id = trip.GetProperty("id").GetString() ?? string.Empty,
-                                type = trip.GetProperty("type").GetString() ?? string.Empty,
+                                id = trip.GetProperty("trip_id").GetString() ?? string.Empty,
+                                type = "trip", 
                                 attributes = new TripAttributes
                                 {
                                     tripId = tripId,
-                                    tripHeadsign = attrs.GetProperty("trip_headsign").GetString() ?? string.Empty,
-                                    tripStartTime = attrs.GetProperty("trip_start_time").GetString() ?? string.Empty,
-                                    routeId = attrs.GetProperty("route_id").GetString() ?? string.Empty,
-                                    serviceDate = attrs.GetProperty("service_date").GetString() ?? string.Empty,
-                                    stopHeadsign = attrs.GetProperty("stop_headsign").GetString() ?? string.Empty,
-                                    directionId = attrs.GetProperty("direction_id").GetInt32(),
-                                    shapeId = attrs.GetProperty("shape_id").GetString() ?? string.Empty
+                                    tripHeadsign = trip.TryGetProperty("trip_headsign", out var headSign) ? headSign.GetString() ?? string.Empty : string.Empty,
+                                    tripStartTime = trip.TryGetProperty("trip_start_time", out var startTime) ? startTime.GetString() ?? string.Empty : string.Empty,
+                                    routeId = trip.GetProperty("route_id").GetString() ?? string.Empty,
+                                    serviceDate = trip.TryGetProperty("service_date", out var servDate) ? servDate.GetString() ?? string.Empty : string.Empty,
+                                    stopHeadsign = trip.TryGetProperty("trip_headsign", out var stopHead) ? stopHead.GetString() ?? string.Empty : string.Empty,
+                                    directionId = trip.TryGetProperty("direction_id", out var dirId) ? dirId.GetInt32() : 0,
+                                    shapeId = trip.TryGetProperty("shape_id", out var shId) ? shId.GetString() ?? string.Empty : string.Empty
                                 }
                             });
                         }
                     }
                 }
 
-
                 // Log that the API call has finished
                 System.Diagnostics.Debug.WriteLine("API call finished");
 
-                // Return the list of matching stops
+                // Return the list of matching trips
                 return trips;
             }
             catch (Exception ex)
