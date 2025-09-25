@@ -5,6 +5,16 @@
              x:Class="safe_travels.App">
     <Application.Resources>
         <ResourceDictionary>
+            <!-- Card background -->
+            <SolidColorBrush x:Key="CardBackgroundColor" 
+                         Color="{AppThemeBinding Light=#f2f2f2, Dark=#1e1e1e}" />
+
+            <!-- Text colors -->
+            <SolidColorBrush x:Key="PrimaryTextColor" 
+                         Color="{AppThemeBinding Light=Black, Dark=White}" />
+
+            <SolidColorBrush x:Key="SecondaryTextColor" 
+                         Color="{AppThemeBinding Light=Gray, Dark=#cccccc}" />
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
