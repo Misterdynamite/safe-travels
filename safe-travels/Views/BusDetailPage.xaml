@@ -24,14 +24,15 @@
                     Clicked="OnSaveStopClicked"
                     HorizontalOptions="End" />
         </HorizontalStackLayout>
-        <Border Background="#f2f2f2" StrokeShape="RoundRectangle 12" Padding="23">
+        <Border Background="{DynamicResource CardBackgroundColor}" StrokeShape="RoundRectangle 12" Padding="23">
+
             <VerticalStackLayout>
                 <Label Text="{Binding StopName}"
                        FontSize="24"
                        FontAttributes="Bold"/>
                 <Label Text="{Binding StopId, StringFormat='Stop ID: {0}'}"
                        FontSize="14"
-                       TextColor="Gray"/>
+                       TextColor="{DynamicResource PrimaryTextColor}"/>
             </VerticalStackLayout>
         </Border>
 
@@ -43,12 +44,11 @@
                 SelectionChanged="OnBusSelected">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Border Background="White" StrokeShape="RoundRectangle 8" Margin="0,4" Padding="12">
+                    <Border Background="{DynamicResource CardBackgroundColor}" StrokeShape="RoundRectangle 8" Margin="0,4" Padding="12">
                         <VerticalStackLayout>
                             <Label Text="{Binding attributes.stopHeadSign}" FontSize="16"/>
                             <Label Text="{Binding attributes.routeId}" FontSize="16"/>
-                            <Label Text="{Binding attributes.arrivalTime}" FontSize="14" TextColor="Gray"/>
-                        </VerticalStackLayout>
+                            <Label Text="{Binding attributes.arrivalTime}" FontSize="14" TextColor="{DynamicResource PrimaryTextColor}"/>                        </VerticalStackLayout>
                     </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
