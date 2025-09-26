@@ -11,7 +11,7 @@ namespace safe_travels.API.AucklandTransportAPI.Legacy
     /// <summary>
     /// Legacy implementation for the original Auckland Transport API for retrieving trip information by stop ID.
     /// </summary>
-    class LegacyStopTripsCalls
+    class LegacyInboundTripsAPI
     {
         /// <summary>
         /// The base URL template for the Auckland Transport stop trips API.

@@ -11,7 +11,7 @@ namespace safe_travels.API.AucklandTransportAPI
     /// <summary>
     /// Provides methods to interact with the Auckland Transport API for retrieving trip information by stop ID.
     /// </summary>
-    class StopTripsCalls
+    class InboundTripsAPI
     {
         /// <summary>
         /// The base URL template for the Auckland Transport stop trips API.

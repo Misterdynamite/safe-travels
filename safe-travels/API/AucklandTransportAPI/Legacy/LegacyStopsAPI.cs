@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -6,17 +6,22 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace safe_travels.API.AucklandTransportAPI
+namespace safe_travels.API.AucklandTransportAPI.Legacy
 {
     /// <summary>
-    /// Provides methods to interact with the Auckland Transport API for retrieving stop information.
+    /// Legacy implementation for the original Auckland Transport API for retrieving stop information.
     /// </summary>
-    class StopsCalls
+    class LegacyStopsAPI
     {
         /// <summary>
         /// The base URL for the Auckland Transport stops API.
         /// </summary>
-        private static readonly string apiURL = "https://rest.kennedys.nz/api/stops";
+        private static readonly string apiURL = "https://api.at.govt.nz/gtfs/v3/stops";
+
+        /// <summary>
+        /// The subscription key required for authenticating API requests.
+        /// </summary>
+        private static readonly string subscriptionKey = "25c926c6234a49c98d52d90a8bd7ac7e";
 
         /// <summary>
         /// Retrieves a list of stops whose names contain the specified input string.
@@ -27,13 +32,12 @@ namespace safe_travels.API.AucklandTransportAPI
         {
             try
             {
-                System.Diagnostics.Debug.WriteLine("Starting API call");
+                System.Diagnostics.Debug.WriteLine("Starting Legacy API call");
                 using var client = new HttpClient();
                 client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", subscriptionKey);
 
-                // Use the new API with search parameter
-                var requestUrl = $"{apiURL}?search={Uri.EscapeDataString(stopNameInput)}";
-                var response = await client.GetAsync(requestUrl);
+                var response = await client.GetAsync(apiURL);
                 response.EnsureSuccessStatusCode();
                 var content = await response.Content.ReadAsStringAsync();
 
@@ -42,28 +46,35 @@ namespace safe_travels.API.AucklandTransportAPI
 
                 var matchingStops = new List<Stop>();
 
-                if (root.TryGetProperty("stops", out var stopsArray))
+                if (root.TryGetProperty("data", out var dataArray))
                 {
-                    foreach (var stop in stopsArray.EnumerateArray())
+                    foreach (var stop in dataArray.EnumerateArray())
                     {
-                        matchingStops.Add(new Stop
+                        var attrs = stop.GetProperty("attributes");
+                        var stopName = attrs.GetProperty("stop_name").GetString();
+
+                        if (!string.IsNullOrEmpty(stopName) &&
+                            stopName.IndexOf(stopNameInput, StringComparison.OrdinalIgnoreCase) >= 0)
                         {
-                            id = stop.GetProperty("stop_id").GetString() ?? string.Empty,
-                            type = "stop",
-                            stopId = stop.GetProperty("stop_id").GetString() ?? string.Empty,
-                            stopName = stop.GetProperty("stop_name").GetString() ?? string.Empty,
-                            stopLat = stop.GetProperty("stop_lat").GetDouble(),
-                            stopLong = stop.GetProperty("stop_lon").GetDouble()
-                        });
+                            matchingStops.Add(new Stop
+                            {
+                                id = stop.GetProperty("id").GetString() ?? string.Empty,
+                                type = stop.GetProperty("type").GetString() ?? string.Empty,
+                                stopId = attrs.GetProperty("stop_id").GetString() ?? string.Empty,
+                                stopName = stopName,
+                                stopLat = attrs.GetProperty("stop_lat").GetDouble(),
+                                stopLong = attrs.GetProperty("stop_lon").GetDouble()
+                            });
+                        }
                     }
                 }
 
-                System.Diagnostics.Debug.WriteLine("API call finished");
+                System.Diagnostics.Debug.WriteLine("Legacy API call finished");
                 return matchingStops;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
+                Console.WriteLine($"An error occurred in Legacy API: {ex.Message}");
                 return new List<Stop>();
             }
         }
@@ -79,12 +90,12 @@ namespace safe_travels.API.AucklandTransportAPI
         {
             try
             {
-                System.Diagnostics.Debug.WriteLine("Starting API call for proximity search");
+                System.Diagnostics.Debug.WriteLine("Starting Legacy API call for proximity search");
                 using var client = new HttpClient();
                 client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", subscriptionKey);
 
-
-                var response = await client.GetAsync($"{apiURL}?per_page=500");
+                var response = await client.GetAsync(apiURL);
                 response.EnsureSuccessStatusCode();
                 var content = await response.Content.ReadAsStringAsync();
 
@@ -93,12 +104,13 @@ namespace safe_travels.API.AucklandTransportAPI
 
                 var matchingStops = new List<Stop>();
 
-                if (root.TryGetProperty("stops", out var stopsArray))
+                if (root.TryGetProperty("data", out var dataArray))
                 {
-                    foreach (var stop in stopsArray.EnumerateArray())
+                    foreach (var stop in dataArray.EnumerateArray())
                     {
-                        var stopLat = stop.GetProperty("stop_lat").GetDouble();
-                        var stopLon = stop.GetProperty("stop_lon").GetDouble();
+                        var attrs = stop.GetProperty("attributes");
+                        var stopLat = attrs.GetProperty("stop_lat").GetDouble();
+                        var stopLon = attrs.GetProperty("stop_lon").GetDouble();
 
                         // Calculate distance using Haversine formula
                         double distance = GetDistanceInMeters(latitude, longitude, stopLat, stopLon);
@@ -107,10 +119,10 @@ namespace safe_travels.API.AucklandTransportAPI
                         {
                             matchingStops.Add(new Stop
                             {
-                                id = stop.GetProperty("stop_id").GetString() ?? string.Empty,
-                                type = "stop",
-                                stopId = stop.GetProperty("stop_id").GetString() ?? string.Empty,
-                                stopName = stop.GetProperty("stop_name").GetString() ?? string.Empty,
+                                id = stop.GetProperty("id").GetString() ?? string.Empty,
+                                type = stop.GetProperty("type").GetString() ?? string.Empty,
+                                stopId = attrs.GetProperty("stop_id").GetString() ?? string.Empty,
+                                stopName = attrs.GetProperty("stop_name").GetString() ?? string.Empty,
                                 stopLat = stopLat,
                                 stopLong = stopLon
                             });
@@ -118,12 +130,12 @@ namespace safe_travels.API.AucklandTransportAPI
                     }
                 }
 
-                System.Diagnostics.Debug.WriteLine("API call for proximity search finished");
+                System.Diagnostics.Debug.WriteLine("Legacy API call for proximity search finished");
                 return matchingStops;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
+                Console.WriteLine($"An error occurred in Legacy API: {ex.Message}");
                 return new List<Stop>();
             }
         }
@@ -146,41 +158,5 @@ namespace safe_travels.API.AucklandTransportAPI
             double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
             return R * c;
         }
-    }
-
-    /// <summary>
-    /// Represents a stop returned by the Auckland Transport API.
-    /// </summary>
-    public class Stop
-    {
-        /// <summary>
-        /// Gets or sets the type of the stop.
-        /// </summary>
-        public required string type { get; set; }
-
-        /// <summary>
-        /// Gets or sets the unique identifier of the stop.
-        /// </summary>
-        public required string id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the stop ID.
-        /// </summary>
-        public required string stopId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the name of the stop.
-        /// </summary>
-        public required string stopName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the latitude of the stop.
-        /// </summary>
-        public double stopLat { get; set; }
-
-        /// <summary>
-        /// Gets or sets the longitude of the stop.
-        /// </summary>
-        public double stopLong { get; set; }
     }
 }

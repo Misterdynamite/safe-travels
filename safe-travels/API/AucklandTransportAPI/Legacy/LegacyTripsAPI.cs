@@ -9,7 +9,7 @@ using System.Xml.Linq;
 
 namespace safe_travels.API.AucklandTransportAPI.Legacy
 {
-    class LegacyTripCalls
+    class LegacyTripsAPI
     {
         /// <summary>
         /// The base URL for the Auckland Transport trips API.

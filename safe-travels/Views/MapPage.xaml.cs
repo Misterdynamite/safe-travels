@@ -68,7 +68,7 @@ public partial class MapPage : ContentPage
     {
         if (e.CurrentSelection?.FirstOrDefault() is Stop selectedStop)
         {
-            var stopTripCalls = new StopTripsCalls();
+            var stopTripCalls = new InboundTripsAPI();
             Dispatcher.Dispatch(async () =>
             {
                 var busDetails = await stopTripCalls.GetTripsByStopID(selectedStop.stopId);
@@ -131,7 +131,6 @@ public partial class MapPage : ContentPage
         ClearMapPins();
         try
         {
-            var masterCaller = new MasterCaller();
             var location = await Geolocation.GetLastKnownLocationAsync();
             if (location == null)
             {
@@ -140,7 +139,7 @@ public partial class MapPage : ContentPage
             double latitude = location?.Latitude ?? -36.75144113475619;
             double longitude = location?.Longitude ?? 174.7286331813561;
 
-            var stops = await masterCaller.FetchStopsNearUser(latitude, longitude);
+            var stops = await AucklandTransportAPIClient.FetchStopsNearUser(latitude, longitude);
             AddStopsToMap(stops);
         }
         catch (Exception ex)
@@ -158,8 +157,7 @@ public partial class MapPage : ContentPage
         ClearMapPins();
         try
         {
-            var masterCaller = new MasterCaller();
-            var stops = await masterCaller.DemoStopToTripFlow(stopName);
+            var stops = await AucklandTransportAPIClient.DemoStopToTripFlow(stopName);
             AddStopsToMap(stops);
         }
         catch (Exception ex)
@@ -193,7 +191,7 @@ public partial class MapPage : ContentPage
             {
                 if (s is Pin clickedPin && clickedPin.BindingContext is Stop clickedStop)
                 {
-                    var stopTripCalls = new StopTripsCalls();
+                    var stopTripCalls = new InboundTripsAPI();
                     var busDetails = await stopTripCalls.GetTripsByStopID(clickedStop.stopId);
                     if (Application.Current?.MainPage is NavigationPage navigationPage)
                     {

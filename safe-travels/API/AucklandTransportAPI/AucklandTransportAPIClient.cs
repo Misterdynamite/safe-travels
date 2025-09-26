@@ -8,26 +8,16 @@ using safe_travels.API.AucklandTransportAPI.Legacy;
 
 namespace safe_travels.API.AucklandTransportAPI
 {
-    internal class MasterCaller
+    internal static class AucklandTransportAPIClient
     {
-        private readonly StopsCalls _stopsCaller;
-        private readonly LegacyStopsCalls _legacyStopsCaller;
-        private readonly StopTripsCalls _stopTripsCaller;
-        private readonly LegacyStopTripsCalls _legacyStopTripsCaller;
-        private readonly TripCalls _tripCaller;
-        private readonly LegacyTripCalls _legacyTripCaller;
+        private static readonly StopsAPI _stopsCaller = new StopsAPI();
+        private static readonly LegacyStopsAPI _legacyStopsCaller = new LegacyStopsAPI();
+        private static readonly InboundTripsAPI _stopTripsCaller = new InboundTripsAPI();
+        private static readonly LegacyInboundTripsAPI _legacyStopTripsCaller = new LegacyInboundTripsAPI();
+        private static readonly TripsAPI _tripCaller = new TripsAPI();
+        private static readonly LegacyTripsAPI _legacyTripCaller = new LegacyTripsAPI();
 
-        public MasterCaller()
-        {
-            _stopsCaller = new StopsCalls();
-            _legacyStopsCaller = new LegacyStopsCalls();
-            _stopTripsCaller = new StopTripsCalls();
-            _legacyStopTripsCaller = new LegacyStopTripsCalls();
-            _tripCaller = new TripCalls();
-            _legacyTripCaller = new LegacyTripCalls();
-        }
-
-        public async Task<List<Stop>> FetchStopsNearUser(double lat, double longi)
+        public static async Task<List<Stop>> FetchStopsNearUser(double lat, double longi)
         {
             List<Stop> stops = new List<Stop>();
 
@@ -77,7 +67,7 @@ namespace safe_travels.API.AucklandTransportAPI
 
             return stops;
         }
-        public async Task<List<Stop>> DemoStopToTripFlow(string stopNameInput)
+        public static async Task<List<Stop>> DemoStopToTripFlow(string stopNameInput)
         {
             List<Stop> stops = new List<Stop>();
 
@@ -138,7 +128,7 @@ namespace safe_travels.API.AucklandTransportAPI
         }
 
 
-        public async Task DemoTripIdData(string tripId)
+        public static async Task DemoTripIdData(string tripId)
         {
             List<TripData> trips = new List<TripData>();
 
@@ -201,7 +191,7 @@ namespace safe_travels.API.AucklandTransportAPI
         /// </summary>
         /// <param name="stopId">The stop ID to get trips for</param>
         /// <returns>A list of TripStopResponse objects</returns>
-        public async Task<List<TripStopResponse>> GetTripsForStop(string stopId)
+        public static async Task<List<TripStopResponse>> GetTripsForStop(string stopId)
         {
             List<TripStopResponse> trips = new List<TripStopResponse>();
 
