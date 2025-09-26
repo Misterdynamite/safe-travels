@@ -39,7 +39,9 @@
         <Label Text="Upcoming Buses" FontSize="18" FontAttributes="Bold"/>
 
         <CollectionView x:Name="BusCollection"
-                ItemsSource="{Binding Trips}">
+                ItemsSource="{Binding Trips}"
+                SelectionMode="Single"
+                SelectionChanged="OnBusSelected">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Border Background="{DynamicResource CardBackgroundColor}" StrokeShape="RoundRectangle 8" Margin="0,4" Padding="12">
