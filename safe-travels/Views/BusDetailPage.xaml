@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="safe_travels.Views.BusDetailPage"
              Title="Bus Stop">
-            
+
     <VerticalStackLayout Padding="20" Spacing="8">
         <SearchBar x:Name="TripSearchBar"
                    Placeholder="Search buses..."
@@ -24,15 +24,14 @@
                     Clicked="OnSaveStopClicked"
                     HorizontalOptions="End" />
         </HorizontalStackLayout>
-        <Border Background="{DynamicResource CardBackgroundColor}" StrokeShape="RoundRectangle 12" Padding="23">
+        <Border Background="#f2f2f2" StrokeShape="RoundRectangle 12" Padding="23">
             <VerticalStackLayout>
                 <Label Text="{Binding StopName}"
                        FontSize="24"
-                       FontAttributes="Bold"
-                TextColor="{DynamicResource SecondaryTextColor}"/>
+                       FontAttributes="Bold"/>
                 <Label Text="{Binding StopId, StringFormat='Stop ID: {0}'}"
                        FontSize="14"
-                       TextColor="{DynamicResource PrimaryTextColor}"/>
+                       TextColor="Gray"/>
             </VerticalStackLayout>
         </Border>
 
@@ -44,11 +43,11 @@
                 SelectionChanged="OnBusSelected">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Border Background="{DynamicResource CardBackgroundColor}" StrokeShape="RoundRectangle 8" Margin="0,4" Padding="12">
+                    <Border Background="White" StrokeShape="RoundRectangle 8" Margin="0,4" Padding="12">
                         <VerticalStackLayout>
                             <Label Text="{Binding attributes.stopHeadSign}" FontSize="16"/>
                             <Label Text="{Binding attributes.routeId}" FontSize="16"/>
-                            <Label Text="{Binding attributes.arrivalTime}" FontSize="14" TextColor="{DynamicResource PrimaryTextColor}"/>
+                            <Label Text="{Binding attributes.arrivalTime}" FontSize="14" TextColor="Gray"/>
                         </VerticalStackLayout>
                     </Border>
                 </DataTemplate>

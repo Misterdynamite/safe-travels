@@ -119,6 +119,11 @@ namespace safe_travels.API.AucklandTransportAPI
         /// Gets or sets the attributes associated with the trip stop.
         /// </summary>
         public required TripStopAttributes attributes { get; set; }
+
+        public override string ToString()
+        {
+            return $"TripStopData: [Type: {type}, Id: {id}, Attributes: {attributes}]";
+        }
     }
 
     /// <summary>
@@ -190,8 +195,14 @@ namespace safe_travels.API.AucklandTransportAPI
         /// Gets or sets the start time of the trip.
         /// </summary>
         public required string tripStartTime { get; set; }
+
+        public override string ToString()
+        {
+            return $"[ArrivalTime: {arrivalTime}, DepartureTime: {departureTime}, DirectionId: {directionId}, DropOffType: {dropOffType}, PickupType: {pickupType}, RouteId: {routeId}, ServiceDate: {serviceDate}, ShapeId: {shapeId}, StopHeadSign: {stopHeadSign}, StopId: {stopId}, StopSequence: {stopSequence}, TripId: {tripId}, TripStartTime: {tripStartTime}]";
+        }
     }
 }
+
 
 
 
