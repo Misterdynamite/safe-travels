@@ -11,12 +11,31 @@
                      Order="Primary" />
     </ContentPage.ToolbarItems>
 
-    <Grid RowDefinitions="*,80">
-        <!-- Map fills most of the screen -->
+    <Grid RowDefinitions="Auto,* ,80">
+        <!-- Controls at the top -->
+        <VerticalStackLayout Grid.Row="0" Padding="0,0,0,4">
+            <Picker x:Name="StopModePicker"
+                    Title="Show stops by..."
+                    SelectedIndexChanged="OnStopModeChanged"
+                    Margin="10">
+                <Picker.Items>
+                    <x:String>Nearby Stops</x:String>
+                    <x:String>Search by Name</x:String>
+                </Picker.Items>
+            </Picker>
+            <SearchBar x:Name="StopSearchBar"
+                       Placeholder="Search for a stop..."
+                       IsVisible="False"
+                       SearchButtonPressed="OnStopSearch"/>
+        </VerticalStackLayout>
+
+        <!-- Map fills all available space -->
         <maps:Map x:Name="StopMap"
                   MapType="Street"
                   IsShowingUser="True"
-                  Grid.Row="0" />
+                  Grid.Row="1"
+                  VerticalOptions="FillAndExpand"
+                  HorizontalOptions="FillAndExpand" />
 
         <!-- Horizontal list of favorite stops at the bottom -->
         <CollectionView x:Name="FavoriteStopsCollection"
@@ -25,7 +44,7 @@
                         HeightRequest="80"
                         Margin="10"
                         SelectionChanged="OnFavoriteStopSelected"
-                        Grid.Row="1">
+                        Grid.Row="2">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Border Background="{DynamicResource CardBackgroundColor}" StrokeShape="RoundRectangle 8" Margin="4" Padding="8">
