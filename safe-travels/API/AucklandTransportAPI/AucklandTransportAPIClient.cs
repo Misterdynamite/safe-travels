@@ -8,6 +8,10 @@ using safe_travels.API.AucklandTransportAPI.Legacy;
 
 namespace safe_travels.API.AucklandTransportAPI
 {
+    /// <summary>
+    /// Provides static methods to interact with Auckland Transport APIs for stops and trips,
+    /// including fallback to legacy APIs if the primary API fails.
+    /// </summary>  
     internal static class AucklandTransportAPIClient
     {
         private static readonly StopsAPI _stopsCaller = new StopsAPI();
@@ -17,6 +21,16 @@ namespace safe_travels.API.AucklandTransportAPI
         private static readonly TripsAPI _tripCaller = new TripsAPI();
         private static readonly LegacyTripsAPI _legacyTripCaller = new LegacyTripsAPI();
 
+        /// <summary>
+        /// Fetches a list of stops near the user's location using the new API, 
+        /// with fallback to the legacy API if necessary.
+        /// </summary>
+        /// <param name="lat">The latitude of the user's location.</param>
+        /// <param name="longi">The longitude of the user's location.</param>
+        /// <returns>
+        /// A list of <see cref="Stop"/> objects within 1000 meters of the specified location.
+        /// Returns an empty list if no stops are found or both APIs fail.
+        /// </returns>
         public static async Task<List<Stop>> FetchStopsNearUser(double lat, double longi)
         {
             List<Stop> stops = new List<Stop>();
@@ -67,6 +81,16 @@ namespace safe_travels.API.AucklandTransportAPI
 
             return stops;
         }
+
+        /// <summary>
+        /// Demonstrates fetching stops by name and selecting the first result.
+        /// Falls back to the legacy API if the new API fails.
+        /// </summary>
+        /// <param name="stopNameInput">The name or partial name of the stop to search for.</param>
+        /// <returns>
+        /// A list of <see cref="Stop"/> objects matching the input name.
+        /// Returns an empty list if no stops are found or both APIs fail.
+        /// </returns>
         public static async Task<List<Stop>> DemoStopToTripFlow(string stopNameInput)
         {
             List<Stop> stops = new List<Stop>();
@@ -127,7 +151,15 @@ namespace safe_travels.API.AucklandTransportAPI
             return stops;
         }
 
-
+        /// <summary>
+        /// Demonstrates fetching trip data by trip ID using the new API,
+        /// with fallback to the legacy API if necessary.
+        /// </summary>
+        /// <param name="tripId">The trip ID to search for.</param>
+        /// <returns>
+        /// A task representing the asynchronous operation.
+        /// Outputs trip details to the debug log.
+        /// </returns>
         public static async Task DemoTripIdData(string tripId)
         {
             List<TripData> trips = new List<TripData>();
@@ -187,10 +219,14 @@ namespace safe_travels.API.AucklandTransportAPI
         }
 
         /// <summary>
-        /// Demonstrates fetching trips for a specific stop with fallback to legacy API
+        /// Fetches trips for a specific stop using the new API, 
+        /// with fallback to the legacy API if necessary.
         /// </summary>
-        /// <param name="stopId">The stop ID to get trips for</param>
-        /// <returns>A list of TripStopResponse objects</returns>
+        /// <param name="stopId">The stop ID to get trips for.</param>
+        /// <returns>
+        /// A list of <see cref="TripStopResponse"/> objects containing trip data for the specified stop.
+        /// Returns an empty list if no trips are found or both APIs fail.
+        /// </returns>
         public static async Task<List<TripStopResponse>> GetTripsForStop(string stopId)
         {
             List<TripStopResponse> trips = new List<TripStopResponse>();
