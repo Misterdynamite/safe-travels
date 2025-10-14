@@ -1,4 +1,5 @@
-﻿using safe_travels.API.AucklandTransportAPI;
+﻿using API_Tester.AucklandTransportAPI;
+using safe_travels.API.AucklandTransportAPI;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,15 +10,25 @@ namespace AucklandTransportAPI
     {
         static async Task Main(string[] args)
         {
-            var stopsCalls = new StopsCalls();
-            var results = await stopsCalls.GetStopsByName("Constellation Bus Station");
-            Stop firstResult = results[0];
-            Console.WriteLine($"Found {results.Count} stops matching 'Torbay'. First stop ID: {firstResult.stopId}, Name: {firstResult.stopName}");
-            
-            
-            var stopTripCalls = new StopTripsCalls();
-            var tripResults = await stopTripCalls.GetTripsByStopID(firstResult.stopId);
-            Console.WriteLine($"Found {tripResults.Count} trips for stop {firstResult.stopName}");
+
+            var stopId = "7128-d8460fc5";
+            Console.WriteLine($"Fetching service alerts for stop ID: {stopId}");
+            var api = new ServiceUpdates();
+            var alerts = await api.GetServiceAlertsAsync(stopId);
+
+            foreach (var alert in alerts)
+            {
+                Console.WriteLine($"{alert.Header}");
+                Console.WriteLine($"Description: {alert.Description}");
+                foreach (var entity in alert.Entities)
+                {
+                    Console.WriteLine($"Route: {entity.RouteId}, Stop: {entity.StopId}");
+                }
+                Console.WriteLine("-----");
+            }
+
         }
+
+
     }
 }
