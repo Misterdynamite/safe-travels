@@ -6,6 +6,8 @@
              Title="Map">
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Settings"
+                     SemanticProperties.Description="Settings"
+                     SemanticProperties.Hint="Open to the Settings Page"
                      Clicked="OnSettingsClicked"
                      Priority="0"
                      Order="Primary" />
@@ -16,6 +18,7 @@
         <VerticalStackLayout Grid.Row="0" Padding="0,0,0,4">
             <Picker x:Name="StopModePicker"
                     Title="Show stops by..."
+                    SemanticProperties.Description="Tap to choose how to view Stops"
                     SelectedIndexChanged="OnStopModeChanged"
                     Margin="10">
                 <Picker.Items>
@@ -24,6 +27,7 @@
                 </Picker.Items>
             </Picker>
             <SearchBar x:Name="StopSearchBar"
+                       SemanticProperties.Description="Stop Search Bar"
                        Placeholder="Search for a stop..."
                        IsVisible="False"
                        SearchButtonPressed="OnStopSearch"/>

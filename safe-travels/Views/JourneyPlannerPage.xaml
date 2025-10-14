@@ -42,6 +42,8 @@
 
                 <!-- Search Bar -->
                 <SearchBar Placeholder="Enter stop number or location..."
+                           SemanticProperties.Description="Enter stop number or location"
+                           SemanticProperties.Hint="Type in a stop number or location to find a Journey"
                            BackgroundColor="#EFEFEF"
                            TextColor="Black"
                            PlaceholderColor="Gray"/>
@@ -76,8 +78,10 @@
 
                 <!-- Cancel / Select Buttons -->
                 <HorizontalStackLayout Spacing="20" HorizontalOptions="End">
-                    <Button Text="Cancel" BackgroundColor="Transparent" TextColor="Gray"/>
-                    <Button Text="Select" BackgroundColor="#B49BEB" TextColor="White" CornerRadius="20"/>
+                    <Button Text="Cancel" BackgroundColor="Transparent" TextColor="Gray"
+                            SemanticProperties.Hint="Cancel"/>
+                    <Button Text="Select" BackgroundColor="#B49BEB" TextColor="White" CornerRadius="20"
+                            SemanticProperties.Hint="Select"/>
                 </HorizontalStackLayout>
 
                 <!-- ETA Section -->

@@ -4,7 +4,9 @@
              x:Class="safe_travels.Views.SettingsPage"
              Title="Settings">
     <VerticalStackLayout Padding="20" Spacing="-36">
-        <Label Text="Change Theme" FontSize="Large"/>
+        <Label Text="Change Theme" FontSize="Large"
+               SemanticProperties.Description="Change Theme"
+               SemanticProperties.Hint="Toggle to change theme"/>
         <Switch x:Name="ThemeSwitch"
             Toggled="OnThemeToggled"/>
     </VerticalStackLayout>

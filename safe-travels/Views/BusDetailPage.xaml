@@ -6,11 +6,15 @@
 
     <VerticalStackLayout Padding="20" Spacing="8">
         <SearchBar x:Name="TripSearchBar"
+                   SemanticProperties.Description="Trip Search Bar"
+                   SemanticProperties.Hint="Enter keywords to search for bus trips"
                    Placeholder="Search buses..."
                    TextChanged="OnSearchTextChanged"
                    HorizontalOptions="CenterAndExpand" />
         <Picker x:Name="FilterPicker"
                 Title="Filter trips"
+                SemanticProperties.Description="Tap to filter Buss Details"
+                SemanticProperties.Hint="Swipe up or down to choose a filter"
                 HorizontalOptions="FillAndExpand">
             <Picker.Items>
                 <x:String>All</x:String>
@@ -21,6 +25,8 @@
         <HorizontalStackLayout Spacing="10">
             <Button x:Name="SaveStopButton"
                     Text="Save Stop"
+                    SemanticProperties.Description="Tap to save this stop"
+                    SemanticProperties.Hint="Double tap to save this stop to your favourites bar"
                     Clicked="OnSaveStopClicked"
                     HorizontalOptions="End" />
         </HorizontalStackLayout>
@@ -28,15 +34,23 @@
 
             <VerticalStackLayout>
                 <Label Text="{Binding StopName}"
+                       SemanticProperties.Description="{Binding StopName}"
+                       SemanticProperties.Hint="Name of selected Buss Stop"
                        FontSize="24"
                        FontAttributes="Bold"/>
                 <Label Text="{Binding StopId, StringFormat='Stop ID: {0}'}"
+                       SemanticProperties.Description="Stop ID {Binding StopId,  StringFormat='Stop ID: {0}'}"
+                       SemanticProperties.Hint="Identifier for this Stop"
                        FontSize="14"
                        TextColor="{DynamicResource PrimaryTextColor}"/>
             </VerticalStackLayout>
         </Border>
 
-        <Label Text="Upcoming Buses" FontSize="18" FontAttributes="Bold"/>
+        <Label Text="Upcoming Buses" FontSize="18" FontAttributes="Bold"
+               SemanticProperties.Description="Upcoming Busses"
+               SemanticProperties.Hint="Below is a list of arriving busses"
+            />
+        
 
         <CollectionView x:Name="BusCollection"
                 ItemsSource="{Binding Trips}"
@@ -46,11 +60,18 @@
                 <DataTemplate>
                     <Border Background="{DynamicResource CardBackgroundColor}" StrokeShape="RoundRectangle 8" Margin="0,4" Padding="12">
                         <VerticalStackLayout>
-                            <Label Text="{Binding attributes.stopHeadSign}" FontSize="16"/>
-                            <Label Text="{Binding attributes.routeId}" FontSize="16"/>
-                            <Label Text="{Binding attributes.arrivalTime}" FontSize="14" TextColor="{DynamicResource PrimaryTextColor}"/>                        </VerticalStackLayout>
+                            <Label Text="{Binding attributes.stopHeadSign}" FontSize="16"
+                                   SemanticProperties.Description="{Binding attributes.stopHeadSign}"
+                                   SemanticProperties.Hint="Buss Destination"/>
+                            <Label Text="{Binding attributes.routeId}" FontSize="16"
+                                   SemanticProperties.Description="{Binding attributes.routeId}"
+                                   SemanticProperties.Hint="Buss Route Number"/>
+                            <Label Text="{Binding attributes.arrivalTime}" FontSize="14" TextColor="{DynamicResource PrimaryTextColor}"
+                                   SemanticProperties.Description="{Binding attributes.arrivalTime}"
+                                   SemanticProperties.Hint="Arrival Time"/>
+                        </VerticalStackLayout>
                     </Border>
-                </DataTemplate>
+                </DataTemplate>'
             </CollectionView.ItemTemplate>
         </CollectionView>
     </VerticalStackLayout>
