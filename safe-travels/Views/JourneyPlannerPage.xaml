@@ -5,10 +5,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     x:Class="safe_travels.Views.JourneyPlannerPage"
     Title="Journey Planner">
+
     <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="White">
-        <maps:Map />
+
+
         <!-- 🔹 Top App Bar -->
-        <Grid BackgroundColor="#F8F8F8" Padding="10" Row="0">
+        <Grid BackgroundColor="#F8F8F8" Padding="10" Row="0" ZIndex="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
@@ -22,7 +24,7 @@
                          Grid.Column="0"/>
 
             <!-- Title -->
-            <Label Text="Label"
+            <Label Text="Journey Planner"
                    FontSize="20"
                    HorizontalOptions="Center"
                    VerticalOptions="Center"
@@ -37,65 +39,89 @@
         </Grid>
 
         <!-- 🔹 Main Content -->
-        <ScrollView Grid.Row="1" Padding="15">
-            <VerticalStackLayout Spacing="15">
+        <VerticalStackLayout Grid.Row="1" Padding="15" Spacing="15" ZIndex="2">
 
-                <!-- Search Bar -->
-                <SearchBar Placeholder="Enter stop number or location..."
-                           BackgroundColor="#EFEFEF"
-                           TextColor="Black"
-                           PlaceholderColor="Gray"/>
+            <!-- Journey Section -->
+            <Label Text="YOUR JOURNEY" FontSize="18" FontAttributes="Bold"/>
+            <Label Text="Choose your journey" FontSize="14" TextColor="Gray"/>
 
-                <!-- Journey Section -->
-                <Label Text="YOUR JOURNEY" FontSize="18" FontAttributes="Bold"/>
-                <Label Text="Choose your journey" FontSize="14" TextColor="Gray"/>
+            <!-- Origin Input -->
+            <Entry x:Name="OriginInput"
+                   Placeholder="Enter origin address..."
+                   TextColor="Black"
+                   TextChanged="OnOriginTextChanged"
+                   Margin="0,5"/>
 
-                <CollectionView>
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <Border Stroke="#DDD" StrokeThickness="1" StrokeShape="RoundRectangle 12" Margin="0,5">
-                                <HorizontalStackLayout Padding="10" Spacing="10">
-                                    <Frame WidthRequest="30" HeightRequest="30" CornerRadius="15" BackgroundColor="#B49BEB" HasShadow="False" VerticalOptions="Center">
-                                        <Label Text="A" HorizontalOptions="Center" VerticalOptions="Center" TextColor="White"/>
-                                    </Frame>
-                                    <Label Text="{Binding .}" VerticalOptions="Center"/>
-                                </HorizontalStackLayout>
-                            </Border>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
+            <!-- Origin Suggestions -->
+            <CollectionView x:Name="OriginSuggestionsView"
+                            IsVisible="False"
+                            BackgroundColor="White"
+                            HeightRequest="200"
+                            ZIndex="10"
+                            SelectionMode="Single">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Label Text="{Binding display_name}"
+                               Padding="10"
+                               TextColor="Black"
+                               BackgroundColor="White">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnOriginSuggestionChosen"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
 
-                    <!-- Example static data -->
-                    <CollectionView.ItemsSource>
-                        <x:Array Type="{x:Type x:String}">
-                            <x:String>Bus #1 to walking 30m to Bus #2 to point B</x:String>
-                            <x:String>Bus #1 to Bus #3 to walking 500m to point B</x:String>
-                            <x:String>Bus #1 to Bus #3 to point B</x:String>
-                        </x:Array>
-                    </CollectionView.ItemsSource>
-                </CollectionView>
+            <!-- Destination Input -->
+            <Entry x:Name="DestinationInput"
+                   Placeholder="Enter destination address..."
+                   TextColor="Black"
+                   TextChanged="OnDestinationTextChanged"
+                   Margin="0,5"/>
 
-                <!-- Cancel / Select Buttons -->
-                <HorizontalStackLayout Spacing="20" HorizontalOptions="End">
-                    <Button Text="Cancel" BackgroundColor="Transparent" TextColor="Gray"/>
-                    <Button Text="Select" BackgroundColor="#B49BEB" TextColor="White" CornerRadius="20"/>
-                </HorizontalStackLayout>
+            <!-- Destination Suggestions -->
+            <CollectionView x:Name="DestinationSuggestionsView"
+                            IsVisible="False"
+                            BackgroundColor="White"
+                            HeightRequest="200"
+                            ZIndex="10"
+                            SelectionMode="Single">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Label Text="{Binding display_name}"
+                               Padding="10"
+                               TextColor="Black"
+                               BackgroundColor="White">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnDestinationSuggestionChosen"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
 
-                <!-- ETA Section -->
-                <Border Stroke="#DDD" StrokeThickness="1" StrokeShape="RoundRectangle 20" Padding="15" BackgroundColor="#F9F9F9">
-                    <VerticalStackLayout Spacing="10">
-                        <Label Text="YOUR BUS TO (LOCATION) ARRIVES IN: 6:07s" FontSize="14" TextColor="Black"/>
-                        <HorizontalStackLayout Spacing="15" HorizontalOptions="Center">
-                            <Button Text="HIDE" WidthRequest="100" BackgroundColor="#E0E0E0" TextColor="Black" CornerRadius="20"/>
-                            <Button Text="OPEN" WidthRequest="100" BackgroundColor="#B49BEB" TextColor="White" CornerRadius="20"/>
-                        </HorizontalStackLayout>
-                    </VerticalStackLayout>
-                </Border>
+            <!-- Journey Results -->
+            <CollectionView x:Name="JourneyResults"
+                            IsVisible="False">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Label Text="{Binding}" Padding="10" TextColor="Black"/>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
 
-            </VerticalStackLayout>
-        </ScrollView>
+            <!-- Plan Journey Button -->
+            <Button Text="Plan Journey"
+                    BackgroundColor="#B49BEB"
+                    TextColor="White"
+                    Clicked="OnPlanJourneyClicked"
+                    Margin="0,10"/>        
+
+        </VerticalStackLayout>
 
         <!-- 🔹 Bottom Navigation -->
-        <Grid Grid.Row="2" BackgroundColor="White" Padding="10" ColumnDefinitions="*,*,*">
+        <Grid Grid.Row="2" BackgroundColor="White" Padding="10" ColumnDefinitions="*,*,*" ZIndex="2">
             <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center">
                 <Image Source="planner.png" HeightRequest="24"/>
                 <Label Text="Journey Planner" FontSize="12" HorizontalOptions="Center"/>
@@ -109,5 +135,6 @@
                 <Label Text="Saved Journeys" FontSize="12" HorizontalOptions="Center"/>
             </VerticalStackLayout>
         </Grid>
+
     </Grid>
 </ContentPage>

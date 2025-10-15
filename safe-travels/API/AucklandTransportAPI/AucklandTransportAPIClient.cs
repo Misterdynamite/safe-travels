@@ -31,14 +31,14 @@ namespace safe_travels.API.AucklandTransportAPI
         /// A list of <see cref="Stop"/> objects within 1000 meters of the specified location.
         /// Returns an empty list if no stops are found or both APIs fail.
         /// </returns>
-        public static async Task<List<Stop>> FetchStopsNearUser(double lat, double longi)
+        public static async Task<List<Stop>> FetchStopsNearUser(double lat, double longi, int meters = 1000)
         {
             List<Stop> stops = new List<Stop>();
 
             try
             {
                 Debug.WriteLine("Attempting to fetch stops using new API...");
-                stops = await _stopsCaller.GetStopsByProximity(lat, longi, 1000);
+                stops = await _stopsCaller.GetStopsByProximity(lat, longi, meters);
                 
                 if (stops != null && stops.Count > 0)
                 {
@@ -55,7 +55,7 @@ namespace safe_travels.API.AucklandTransportAPI
                 
                 try
                 {
-                    stops = await _legacyStopsCaller.GetStopsByProximity(lat, longi, 1000);
+                    stops = await _legacyStopsCaller.GetStopsByProximity(lat, longi, meters);
                     if (stops != null && stops.Count > 0)
                     {
                         Debug.WriteLine($"Successfully fetched {stops.Count} stops using legacy API");
