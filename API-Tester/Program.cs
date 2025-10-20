@@ -14,7 +14,7 @@ namespace AucklandTransportAPI
             var stopId = "7128-d8460fc5";
             Console.WriteLine($"Fetching service alerts for stop ID: {stopId}");
             var api = new ServiceUpdates();
-            var alerts = await api.GetServiceAlertsAsync(stopId);
+            var alerts = await api.GetLegacyServiceAlertsAsync(stopId);
 
             foreach (var alert in alerts)
             {
