@@ -158,7 +158,7 @@ public partial class MapPage : ContentPage
         try
         {
             var stops = await AucklandTransportAPIClient.DemoStopToTripFlow(stopName);
-            await AddStopsToMap(stops);
+            AddStopsToMap(stops);
         }
         catch (Exception ex)
         {
@@ -170,7 +170,7 @@ public partial class MapPage : ContentPage
     /// Adds a collection of stops as pins to the map and centers the map view.
     /// </summary>
     /// <param name="stops">The stops to add to the map.</param>
-    private async Task AddStopsToMap(IEnumerable<Stop> stops)
+    private void AddStopsToMap(IEnumerable<Stop> stops)
     {
         if (stops == null || !stops.Any()) return;
 
@@ -207,7 +207,6 @@ public partial class MapPage : ContentPage
                     }
                 }
             };
-            await Task.Yield(); // Yield to keep UI responsive during pin addition
         }
 
         // Center map between all stops
@@ -297,11 +296,6 @@ public partial class MapPage : ContentPage
     private async void OnSettingsClicked(object sender, EventArgs e)
     {
         await Navigation.PushAsync(new SettingsPage());
-    }
-
-    private async void OnJourneyPlannerClicked(object sender, EventArgs e)
-    {
-        await Navigation.PushAsync(new JourneyPlannerPage());
     }
 
     #endregion

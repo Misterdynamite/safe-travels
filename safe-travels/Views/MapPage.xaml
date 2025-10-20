@@ -31,10 +31,6 @@
                        Placeholder="Search for a stop..."
                        IsVisible="False"
                        SearchButtonPressed="OnStopSearch"/>
-            <Button Text="Journey Planner"
-                    Margin="10,0,10,0"
-                    Clicked="OnJourneyPlannerClicked"
-                    HorizontalOptions="FillAndExpand"/>
         </VerticalStackLayout>
 
         <!-- Map fills all available space -->
