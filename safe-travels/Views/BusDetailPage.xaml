@@ -71,7 +71,7 @@
                                    SemanticProperties.Hint="Arrival Time"/>
                         </VerticalStackLayout>
                     </Border>
-                </DataTemplate>'
+                </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
     </VerticalStackLayout>
