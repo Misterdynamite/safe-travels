@@ -1,8 +1,12 @@
+using Android.Content;
+using Java.Nio.FileNio;
 using Microsoft.Maui.Controls.Maps;
 using Microsoft.Maui.Devices.Sensors;
 using Microsoft.Maui.Maps;
 using safe_travels.API.AucklandTransportAPI;
 using safe_travels.Utilities;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 
 namespace safe_travels.Views;
 
@@ -193,18 +197,29 @@ public partial class MapPage : ContentPage
                 {
                     var stopTripCalls = new InboundTripsAPI();
                     var busDetails = await stopTripCalls.GetTripsByStopID(clickedStop.stopId);
-                    if (Application.Current?.MainPage is NavigationPage navigationPage)
+
+                    //pammis bit
+                    if (IsTrainStop(clickedStop.stopName))
                     {
-                        await navigationPage.Navigation.PushAsync(new BusDetailPage(busDetails, clickedStop.stopName, clickedStop.stopId));
-                    }
-                    else if (Navigation != null)
+                       var flatTrips = busDetails.SelectMany(bd => bd.data).ToList();
+                        await Navigation.PushAsync(new TrainDetailPage(flatTrips, clickedStop.stopId, clickedStop.stopName));
+                    } else
                     {
-                        await Navigation.PushAsync(new BusDetailPage(busDetails, clickedStop.stopName, clickedStop.stopId));
+                        if (Application.Current?.MainPage is NavigationPage navigationPage)
+                        {
+                            await navigationPage.Navigation.PushAsync(new BusDetailPage(busDetails, clickedStop.stopName, clickedStop.stopId));
+                        }
+                        else if (Navigation != null)
+                        {
+                            await Navigation.PushAsync(new BusDetailPage(busDetails, clickedStop.stopName, clickedStop.stopId));
+                        }
+                        else
+                        {
+                            await DisplayAlert("Navigation Error", "Navigation is not available. Please ensure this page is within a NavigationPage.", "OK");
+                        }
                     }
-                    else
-                    {
-                        await DisplayAlert("Navigation Error", "Navigation is not available. Please ensure this page is within a NavigationPage.", "OK");
-                    }
+                    //
+                    
                 }
             };
             await Task.Yield(); // Yield to keep UI responsive during pin addition
@@ -285,15 +300,32 @@ public partial class MapPage : ContentPage
     /// </summary>
     /// <param name="sender">The event sender.</param>
     /// <param name="e">Pin clicked event arguments.</param>
-    private void OnMarkerClicked(object sender, PinClickedEventArgs e)
+    /// 
+    private bool IsTrainStop(string stopName)
     {
-        if (sender is Pin pin && pin.MarkerId is string stopId)
-        {
-            Console.WriteLine($"StopID: {stopId}");
-        }
+        return stopName.Contains("Train Station", StringComparison.OrdinalIgnoreCase)
+            || stopName.Contains("Station", StringComparison.OrdinalIgnoreCase)
+            || stopName.Contains("Train", StringComparison.OrdinalIgnoreCase);
     }
 
+    private async Task OnMarkerClicked(object sender, PinClickedEventArgs e)
+    {
+        if ( sender is not Pin pin || pin.MarkerId is not string stopId)
+            return;
 
+        var context = BindingContext as dynamic;
+        if (context?.Trips is not List<TripStopData> trips)
+            return;
+
+        string stopName = pin.Label ?? "";
+        Console.WriteLine($"StopID: {stopId}");
+
+       await Navigation.PushAsync(new BusDetailPage(trips, stopName, stopId));
+        
+       
+    }
+
+ 
     private async void OnSettingsClicked(object sender, EventArgs e)
     {
         await Navigation.PushAsync(new SettingsPage());

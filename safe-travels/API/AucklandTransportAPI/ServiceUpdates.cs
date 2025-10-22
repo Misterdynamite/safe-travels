@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using safe_travels.API.AucklandTransportAPI;
+using System.Text.Json;
 
 namespace API_Tester.AucklandTransportAPI
 {
@@ -126,5 +127,71 @@ namespace API_Tester.AucklandTransportAPI
             public string RouteId { get; set; }
             public string StopId { get; set; }
         }
+
+        //Function to check if a train LINE is running
+        public bool isTrainRunning(TripStopAttributes trip, List<ServiceAlert> alerts, DateTime now, String agencyId = "")
+        {
+            //first check service date
+            if (!DateTime.TryParse(trip.serviceDate, out DateTime serviceDate) || serviceDate.Date != now.Date)
+                return false;
+
+            //check pickup / dropoff
+            if (trip.pickupType != 0 || trip.dropOffType != 0)
+                return false;
+
+            //check time window
+            if (!DateTime.TryParse(trip.tripStartTime, out DateTime tripStart) || !DateTime.TryParse(trip.arrivalTime, out DateTime arrival))
+                return false;
+
+            if (now.TimeOfDay < tripStart.TimeOfDay || now.TimeOfDay > arrival.TimeOfDay)
+                return false;
+
+            //check service alert
+            foreach (var alert in alerts)
+            {
+                if (isAlertActive(alert, now, trip.routeId, trip.stopId, agencyId))
+                    return false;
+            }
+
+
+
+            return true;
+
+        }
+
+
+        private bool isAlertActive(
+            ServiceAlert alert,
+            DateTime now,
+            string routeId,
+            string stopId,
+            string agencyId)
+        {
+            foreach (var period in alert.ActivePeriods)
+            {
+                DateTime start = DateTimeOffset.FromUnixTimeSeconds(period.Start).DateTime;
+                DateTime end = DateTimeOffset.FromUnixTimeSeconds(period.End).DateTime;
+                if (now >= start && now <= end)
+                {
+                    //check if alert affects the route/stop/agency
+                    foreach (var entity in alert.Entities)
+                    {
+                        if ((!string.IsNullOrEmpty(entity.RouteId) && entity.RouteId == routeId) ||
+                            (!string.IsNullOrEmpty(entity.StopId) && entity.StopId == stopId) ||
+                            (!string.IsNullOrEmpty(entity.AgencyId) && entity.AgencyId == agencyId))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+
+        }
+
     }
+
+    
+  
+
 }

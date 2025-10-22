@@ -1,3 +1,4 @@
+﻿using API_Tester.AucklandTransportAPI;
 using safe_travels.API.AucklandTransportAPI;
 using safe_travels.Utilities;
 using System.Security.Cryptography.X509Certificates;
@@ -12,6 +13,7 @@ public partial class BusDetailPage : ContentPage
 {
     private string _stopName;
     private string _stopId;
+    private List<TripStopData> trips;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BusDetailPage"/> class.
@@ -38,8 +40,18 @@ public partial class BusDetailPage : ContentPage
         {
             StopName = stopName,
             StopId = stopId,
-            Trips = trips.SelectMany(t => t.data).ToList()
+            Trips = trips.SelectMany(t => t.data).ToList(),
         };
+    }
+
+    /*
+     * Constructor overload to accept List<TripStopData> directly.
+     */
+    public BusDetailPage(List<TripStopData> trips, string stopName, string stopId)
+    {
+        this.trips = trips;
+        _stopName = stopName;
+        _stopId = stopId;
     }
 
     /// <summary>
@@ -173,4 +185,6 @@ public partial class BusDetailPage : ContentPage
         await Task.Delay(delay);
         await DisplayAlert("Bus Arriving Soon", $"Bus to '{bus.attributes.stopHeadSign}' arrives in {minutesBefore} minutes.", "OK");
     }
+
+   
 }

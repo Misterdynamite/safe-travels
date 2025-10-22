@@ -29,6 +29,7 @@
                     SemanticProperties.Hint="Double tap to save this stop to your favourites bar"
                     Clicked="OnSaveStopClicked"
                     HorizontalOptions="End" />
+            
         </HorizontalStackLayout>
         <Border Background="{DynamicResource CardBackgroundColor}" StrokeShape="RoundRectangle 12" Padding="23">
 

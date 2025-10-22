@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="safe_travels.Views.TrainDetailPage"
+             Title="Train Stop">
+
+    <VerticalStackLayout Padding="20" Spacing="8">
+
+        <!-- Stop Info -->
+        <Label x:Name="StopNameLabel"
+               FontSize="24"
+               FontAttributes="Bold"
+               SemanticProperties.Description="Train Stop Name"
+               SemanticProperties.Hint="Name of selected train stop" />
+
+        <Label x:Name="StopIdLabel"
+               FontSize="14"
+               SemanticProperties.Description="Train Stop ID"
+               SemanticProperties.Hint="Identifier for this train stop" />
+
+        <!-- Search and Filter -->
+        <SearchBar x:Name="TripSearchBar"
+                   Placeholder="Search trains..."
+                   TextChanged="OnSearchTextChanged"
+                   SemanticProperties.Description="Trip Search Bar"
+                   SemanticProperties.Hint="Enter keywords to search for train trips" />
+
+        <Picker x:Name="FilterPicker"
+                Title="Filter trips"
+                SemanticProperties.Description="Tap to filter Train Details"
+                SemanticProperties.Hint="Swipe up or down to choose a filter">
+            <Picker.Items>
+                <x:String>All</x:String>
+                <x:String>Arriving Soon</x:String>
+                <x:String>Favorites</x:String>
+            </Picker.Items>
+        </Picker>
+
+        <!-- Save Button -->
+        <HorizontalStackLayout Spacing="10">
+            <Button x:Name="SaveStopButton"
+                    Text="Save Stop"
+                    Clicked="OnSaveStopClicked"
+                    HorizontalOptions="End"
+                    SemanticProperties.Description="Tap to save this stop"
+                    SemanticProperties.Hint="Double tap to save this stop to your favourites bar" />
+        </HorizontalStackLayout>
+
+        <!-- Stop Summary Card -->
+        <Border Background="{DynamicResource CardBackgroundColor}" StrokeShape="RoundRectangle 12" Padding="23">
+            <VerticalStackLayout>
+                <Label Text="{Binding StopName}"
+                       FontSize="24"
+                       FontAttributes="Bold"
+                       SemanticProperties.Description="{Binding StopName}"
+                       SemanticProperties.Hint="Name of selected train stop" />
+                <Label Text="{Binding StopId, StringFormat='Stop ID: {0}'}"
+                       FontSize="14"
+                       TextColor="{DynamicResource PrimaryTextColor}"
+                       SemanticProperties.Description="Stop ID"
+                       SemanticProperties.Hint="Identifier for this stop" />
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- Upcoming Trains -->
+        <Label Text="Upcoming Trains"
+               FontSize="18"
+               FontAttributes="Bold"
+               SemanticProperties.Description="Upcoming Trains"
+               SemanticProperties.Hint="Below is a list of arriving trains" />
+
+        <!-- Trip List -->
+        <CollectionView x:Name="TrainCollection"
+                        ItemsSource="{Binding Trips}"
+                        SelectionMode="Single"
+                        SelectionChanged="onTrainSelected">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Background="{DynamicResource CardBackgroundColor}" StrokeShape="RoundRectangle 8" Margin="0,4" Padding="12">
+                        <VerticalStackLayout>
+                            <Label Text="{Binding attributes.stopHeadSign}" FontSize="16"
+                                   SemanticProperties.Description="{Binding attributes.stopHeadSign}"
+                                   SemanticProperties.Hint="Train Destination" />
+                            <Label Text="{Binding attributes.routeId}" FontSize="16"
+                                   SemanticProperties.Description="{Binding attributes.routeId}"
+                                   SemanticProperties.Hint="Train Route Number" />
+                            <Label Text="{Binding attributes.arrivalTime}" FontSize="14"
+                                   TextColor="{DynamicResource PrimaryTextColor}"
+                                   SemanticProperties.Description="{Binding attributes.arrivalTime}"
+                                   SemanticProperties.Hint="Arrival Time" />
+                        </VerticalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </VerticalStackLayout>
+</ContentPage>
