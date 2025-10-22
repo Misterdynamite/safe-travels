@@ -50,6 +50,9 @@ public partial class MapPage : ContentPage
     {
         base.OnAppearing();
         LoadFavoriteStops();
+
+        bool isAccessibilityMode = Preferences.Get("AccessibilityMode", false);
+        AccessibilityHelper.ToggleLayout(NormalView, AccessibilityView, isAccessibilityMode);
     }
 
     #region Favorite Stops
@@ -145,6 +148,7 @@ public partial class MapPage : ContentPage
 
             var stops = await AucklandTransportAPIClient.FetchStopsNearUser(latitude, longitude);
             AddStopsToMap(stops);
+            ShowStopsInAccessibilityView(stops);
         }
         catch (Exception ex)
         {
@@ -163,6 +167,7 @@ public partial class MapPage : ContentPage
         {
             var stops = await AucklandTransportAPIClient.DemoStopToTripFlow(stopName);
             await AddStopsToMap(stops);
+            ShowStopsInAccessibilityView(stops);
         }
         catch (Exception ex)
         {
@@ -307,6 +312,17 @@ public partial class MapPage : ContentPage
             || stopName.Contains("Station", StringComparison.OrdinalIgnoreCase)
             || stopName.Contains("Train", StringComparison.OrdinalIgnoreCase);
     }
+    /// <summary>
+    /// Handles nearby stops click events.
+    /// </summary>
+    /// <param name="sender">The event sender.</param>
+    /// <param name="e">Pin clicked event arguments.</param>
+    private void OnNearbyStopsButtonClicked(object sender, EventArgs e)
+    {
+        StopModePicker.SelectedIndex = 0; // Nearby
+        StopSearchBar.IsVisible = false;
+        LoadStopsInProximity();
+    }
 
     private async Task OnMarkerClicked(object sender, PinClickedEventArgs e)
     {
@@ -322,10 +338,25 @@ public partial class MapPage : ContentPage
 
        await Navigation.PushAsync(new BusDetailPage(trips, stopName, stopId));
         
-       
     }
 
- 
+    /// <summary>
+    /// Handles search button click events.
+    /// </summary>
+    /// <param name="sender">The event sender.</param>
+    /// <param name="e">Pin clicked event arguments.</param>
+    private void OnSearchStopsButtonClicked(object sender, EventArgs e)
+    {
+        StopModePicker.SelectedIndex = 1; // Search mode
+        StopSearchBar.IsVisible = true;
+
+        // In accessibility mode, we can show the search bar or a prompt
+        if (AccessibilityView.IsVisible)
+        {
+            DisplayAlert("Search Mode", "Enter a stop name in the search field.", "OK");
+        }
+    }
+
     private async void OnSettingsClicked(object sender, EventArgs e)
     {
         await Navigation.PushAsync(new SettingsPage());
@@ -336,6 +367,28 @@ public partial class MapPage : ContentPage
         await Navigation.PushAsync(new JourneyPlannerPage());
     }
 
+
+
     #endregion
 
+    #region Accessibility Mode
+    private void ShowStopsInAccessibilityView(IEnumerable<Stop> stops)
+    {
+        if (AccessibilityView.IsVisible)
+        {
+            AccessibleStopsList.ItemsSource = stops.ToList();
+        }
+    }
+
+    private async void OnAccessibleStopSelected(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.CurrentSelection?.FirstOrDefault() is Stop selectedStop)
+        {
+            var stopTripCalls = new InboundTripsAPI();
+            var busDetails = await stopTripCalls.GetTripsByStopID(selectedStop.stopId);
+            await Navigation.PushAsync(new BusDetailPage(busDetails, selectedStop.stopName, selectedStop.stopId));
+        }
+        AccessibleStopsList.SelectedItem = null;
+    }
+    #endregion
 }
