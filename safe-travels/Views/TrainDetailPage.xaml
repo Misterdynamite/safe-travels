@@ -46,22 +46,6 @@
                     SemanticProperties.Hint="Double tap to save this stop to your favourites bar" />
         </HorizontalStackLayout>
 
-        <!-- Stop Summary Card -->
-        <Border Background="{DynamicResource CardBackgroundColor}" StrokeShape="RoundRectangle 12" Padding="23">
-            <VerticalStackLayout>
-                <Label Text="{Binding StopName}"
-                       FontSize="24"
-                       FontAttributes="Bold"
-                       SemanticProperties.Description="{Binding StopName}"
-                       SemanticProperties.Hint="Name of selected train stop" />
-                <Label Text="{Binding StopId, StringFormat='Stop ID: {0}'}"
-                       FontSize="14"
-                       TextColor="{DynamicResource PrimaryTextColor}"
-                       SemanticProperties.Description="Stop ID"
-                       SemanticProperties.Hint="Identifier for this stop" />
-            </VerticalStackLayout>
-        </Border>
-
         <!-- Upcoming Trains -->
         <Label Text="Upcoming Trains"
                FontSize="18"
