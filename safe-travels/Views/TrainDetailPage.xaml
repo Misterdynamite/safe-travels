@@ -53,7 +53,26 @@
                SemanticProperties.Description="Upcoming Trains"
                SemanticProperties.Hint="Below is a list of arriving trains" />
 
-        <!-- Trip List -->
+        <!-- Train Stops List -->
+        
+            <CollectionView
+        x:Name="TrainStopsCollection"
+        ItemsSource="{Binding TripStops}"
+        SelectionMode="Single"
+        SelectionChanged="onTrainSelected">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <StackLayout Padding="10">
+                                <Label Text="{Binding attributes.stopHeadSign}" FontSize="16" />
+                                <Label Text="{Binding attributes.stopId}" FontSize="12" TextColor="Gray" />
+                            </StackLayout>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+
+
+            <!-- Trip List -->
         <CollectionView x:Name="TrainCollection"
                         ItemsSource="{Binding Trips}"
                         SelectionMode="Single"
