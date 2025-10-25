@@ -19,7 +19,10 @@ public partial class MapPage : ContentPage
     /// Stores the user's favorite bus stops.
     /// </summary>
     private List<Stop> _favoriteStops = new();
-
+    private List<Stop> _accessibleStops = new();
+    private int _currentStopBatch = 0;
+    private const int StopsPerBatch = 10;
+    private bool _isStopsListVisible = false;
     /// <summary>
     /// Mode for showing stops near the user's location.
     /// </summary>
@@ -48,11 +51,11 @@ public partial class MapPage : ContentPage
     /// </summary>
     protected override void OnAppearing()
     {
-        base.OnAppearing();
-        LoadFavoriteStops();
-
         bool isAccessibilityMode = Preferences.Get("AccessibilityMode", false);
-        AccessibilityHelper.ToggleLayout(NormalView, AccessibilityView, isAccessibilityMode);
+
+        NormalView.IsVisible = !isAccessibilityMode;
+        AccessibilityView.IsVisible = isAccessibilityMode;
+
     }
 
     #region Favorite Stops
@@ -319,9 +322,25 @@ public partial class MapPage : ContentPage
     /// <param name="e">Pin clicked event arguments.</param>
     private void OnNearbyStopsButtonClicked(object sender, EventArgs e)
     {
+        if (_isStopsListVisible)
+        {
+            AccessibleStopsList.IsVisible = false;
+            ShowMoreButton.IsVisible = false;
+            _isStopsListVisible = false;
+            SemanticScreenReader.Announce("Nearby stops list hidden.");
+            return;
+        }
+
+        _isStopsListVisible = true;
+        AccessibleStopsList.IsVisible = true;
         StopModePicker.SelectedIndex = 0; // Nearby
         StopSearchBar.IsVisible = false;
         LoadStopsInProximity();
+    }
+
+    private void OnShowMoreClicked(object sender, EventArgs e)
+    {
+        ShowNextBatchOfStops();
     }
 
     private async Task OnMarkerClicked(object sender, PinClickedEventArgs e)
@@ -378,6 +397,29 @@ public partial class MapPage : ContentPage
         {
             AccessibleStopsList.ItemsSource = stops.ToList();
         }
+        _accessibleStops = stops.ToList();
+        _currentStopBatch = 0;
+
+        ShowNextBatchOfStops();
+    }
+
+    private void ShowNextBatchOfStops()
+    {
+        if (_accessibleStops == null || !_accessibleStops.Any())
+        {
+            AccessibleStopsList.ItemsSource = new List<Stop>();
+            return;
+        }
+
+        int start = _currentStopBatch * StopsPerBatch;
+        int end = Math.Min(start + StopsPerBatch, _accessibleStops.Count);
+
+        var visibleBatch = _accessibleStops.Take(end).ToList();
+        AccessibleStopsList.ItemsSource = visibleBatch;
+
+        _currentStopBatch++;
+
+        ShowMoreButton.IsVisible = _currentStopBatch * StopsPerBatch < _accessibleStops.Count;
     }
 
     private async void OnAccessibleStopSelected(object sender, SelectionChangedEventArgs e)

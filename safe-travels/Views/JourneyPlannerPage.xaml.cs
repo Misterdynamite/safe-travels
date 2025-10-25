@@ -38,6 +38,8 @@ public partial class JourneyPlannerPage : ContentPage
         DestinationSuggestionsView.ItemsSource = _destinationSuggestions;
     }
 
+    
+
     #endregion
 
     #region Autocomplete Handlers
@@ -271,4 +273,16 @@ public partial class JourneyPlannerPage : ContentPage
     }
 
     #endregion
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+
+        // Get saved accessibility mode preference
+        bool isAccessibilityMode = Preferences.Get("AccessibilityMode", false);
+
+        // Toggle layouts accordingly
+        NormalView.IsVisible = !isAccessibilityMode;
+        AccessibilityView.IsVisible = isAccessibilityMode;
+    }
 }
