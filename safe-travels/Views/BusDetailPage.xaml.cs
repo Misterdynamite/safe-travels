@@ -1,6 +1,7 @@
 ﻿using API_Tester.AucklandTransportAPI;
 using safe_travels.API.AucklandTransportAPI;
 using safe_travels.Utilities;
+using safe_travels.Models;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
@@ -134,24 +135,64 @@ public partial class BusDetailPage : ContentPage
         });
     }
 
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        // Update SaveStopButton text depending on favorite status
+        try
+        {
+            if (!string.IsNullOrWhiteSpace(_stopId) && FavoriteBusManager.IsFavorite(_stopId))
+            {
+                SaveStopButton.Text = "Remove Stop";
+            }
+            else
+            {
+                SaveStopButton.Text = "Save Stop";
+            }
+        }
+        catch
+        {
+            // ignore
+        }
+    }
+
     /// <summary>
     /// Handles the event when the user clicks to save the stop as a favorite.
+    /// If the stop is already saved, offers removal.
+    /// Otherwise prompts for an optional nickname and saves the favorite.
     /// </summary>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">The event arguments.</param>
-    private void OnSaveStopClicked(object sender, EventArgs e)
+    private async void OnSaveStopClicked(object sender, EventArgs e)
     {
-        // Create a Stop object and save as favorite
-        var stop = new Stop
+        if (string.IsNullOrWhiteSpace(_stopId))
+        {
+            await DisplayAlert("Error", "Stop ID is missing.", "OK");
+            return;
+        }
+
+        // If already favorite, remove it immediately
+        if (FavoriteBusManager.IsFavorite(_stopId))
+        {
+            FavoriteBusManager.RemoveFavoriteStop(_stopId);
+            SaveStopButton.Text = "Save Stop";
+            await DisplayAlert("Removed", $"Removed '{_stopName}' from favorites.", "OK");
+            return;
+        }
+
+        // Not a favorite yet - prompt for nickname then save
+        string? nickname = await DisplayPromptAsync("Save Favorite", "Enter a nickname for this stop (optional)", "Save", "Cancel", "", -1, Keyboard.Text, "");
+
+        var fav = new FavoriteStop
         {
             stopId = _stopId,
             stopName = _stopName,
-            id = _stopId, // Assuming id should match stopId
-            type = "stop" // Assuming type is always "stop"
-            // Add other properties if needed
+            id = _stopId,
+            type = "stop",
+            Nickname = string.IsNullOrWhiteSpace(nickname) ? null : nickname
         };
-        FavoriteBusManager.AddFavoriteStop(stop);
-        DisplayAlert("Saved", $"Stop '{_stopName}' saved to favorites.", "OK");
+
+        FavoriteBusManager.AddFavoriteStop(fav);
+        SaveStopButton.Text = "Remove Stop";
+        await DisplayAlert("Saved", $"Stop '{fav.DisplayLabel}' saved to favorites.", "OK");
     }
 
     /// <summary>
@@ -354,6 +395,4 @@ public partial class BusDetailPage : ContentPage
         StopAutoRefresh();
         System.Diagnostics.Debug.WriteLine("Stopped auto-refresh timer");
     }
-
-   
 }

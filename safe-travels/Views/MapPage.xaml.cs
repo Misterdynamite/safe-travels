@@ -5,6 +5,7 @@ using Microsoft.Maui.Devices.Sensors;
 using Microsoft.Maui.Maps;
 using safe_travels.API.AucklandTransportAPI;
 using safe_travels.Utilities;
+using safe_travels.Models;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
@@ -18,11 +19,14 @@ public partial class MapPage : ContentPage
     /// <summary>
     /// Stores the user's favorite bus stops.
     /// </summary>
-    private List<Stop> _favoriteStops = new();
+    private List<FavoriteStop> _favoriteStops = new();
+
+    // Accessibility list and batching state
     private List<Stop> _accessibleStops = new();
     private int _currentStopBatch = 0;
     private const int StopsPerBatch = 10;
     private bool _isStopsListVisible = false;
+
     /// <summary>
     /// Mode for showing stops near the user's location.
     /// </summary>
@@ -67,36 +71,54 @@ public partial class MapPage : ContentPage
     {
         _favoriteStops = FavoriteBusManager.LoadFavoriteStops();
         FavoriteStopsCollection.ItemsSource = _favoriteStops;
+
+        // If an accessibility favorites list exists in XAML, populate it too so the AccessibilityView shows the same favorites
+        var accessibleFavorites = FindByName("AccessibleFavoriteStops") as CollectionView;
+        if (accessibleFavorites != null)
+        {
+            accessibleFavorites.ItemsSource = _favoriteStops;
+        }
     }
 
     /// <summary>
-    /// Handles selection of a favorite stop, navigates to its detail page.
+    /// Handles selection of a favorite stop, opens its detail page.
     /// </summary>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">Selection changed event arguments.</param>
-    private void OnFavoriteStopSelected(object sender, SelectionChangedEventArgs e)
+    private async void OnFavoriteStopSelected(object sender, SelectionChangedEventArgs e)
     {
-        if (e.CurrentSelection?.FirstOrDefault() is Stop selectedStop)
+        if (e.CurrentSelection?.FirstOrDefault() is FavoriteStop fav)
         {
+            // clear selection immediately
+            FavoriteStopsCollection.SelectedItem = null;
+
             var stopTripCalls = new InboundTripsAPI();
-            Dispatcher.Dispatch(async () =>
+            var busDetails = await stopTripCalls.GetTripsByStopID(fav.stopId);
+
+            if (Application.Current?.MainPage is NavigationPage navigationPage)
             {
-                var busDetails = await stopTripCalls.GetTripsByStopID(selectedStop.stopId);
-                if (Application.Current?.MainPage is NavigationPage navigationPage)
-                {
-                    await navigationPage.Navigation.PushAsync(new BusDetailPage(busDetails, selectedStop.stopName, selectedStop.stopId));
-                }
-                else if (Navigation != null)
-                {
-                    await Navigation.PushAsync(new BusDetailPage(busDetails, selectedStop.stopName, selectedStop.stopId));
-                }
-                else
-                {
-                    await DisplayAlert("Navigation Error", "Navigation is not available. Please ensure this page is within a NavigationPage.", "OK");
-                }
-            });
+                await navigationPage.Navigation.PushAsync(new BusDetailPage(busDetails, fav.stopName, fav.stopId));
+            }
+            else if (Navigation != null)
+            {
+                await Navigation.PushAsync(new BusDetailPage(busDetails, fav.stopName, fav.stopId));
+            }
+            else
+            {
+                await DisplayAlert("Navigation Error", "Navigation is not available. Please ensure this page is within a NavigationPage.", "OK");
+            }
         }
-        FavoriteStopsCollection.SelectedItem = null;
+    }
+
+    /// <summary>
+    /// Remove favorite when user taps the inline Remove button in the favorite item.
+    /// </summary>
+    private async void OnRemoveFavoriteClicked(object sender, EventArgs e)
+    {
+        if (sender is Button btn && btn.BindingContext is FavoriteStop fav)
+        {
+            FavoriteBusManager.RemoveFavoriteStop(fav.stopId);
+            LoadFavoriteStops();
+            await DisplayAlert("Removed", $"Removed favorite '{fav.DisplayLabel}'", "OK");
+        }
     }
     #endregion
 
@@ -308,7 +330,7 @@ public partial class MapPage : ContentPage
     /// </summary>
     /// <param name="sender">The event sender.</param>
     /// <param name="e">Pin clicked event arguments.</param>
-    /// 
+    
     private bool IsTrainStop(string stopName)
     {
         return stopName.Contains("Train Station", StringComparison.OrdinalIgnoreCase)
