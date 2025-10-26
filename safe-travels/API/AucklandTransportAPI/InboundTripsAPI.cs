@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using safe_travels.Utilities;
 
 namespace safe_travels.API.AucklandTransportAPI
 {
@@ -30,7 +31,7 @@ namespace safe_travels.API.AucklandTransportAPI
         {
             try
             {
-                var requestUrl = $"https://rest.kennedys.nz/api/stops/{stopIdInput}/trips";
+                var requestUrl = $"https://rest.kennedys.nz/api/stops/{stopIdInput}/trips?limit=20";
 
                 using var client = new HttpClient();
                 client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
@@ -59,12 +60,12 @@ namespace safe_travels.API.AucklandTransportAPI
                                     attributes = new TripStopAttributes
                                     {
                                         arrivalTime = trip.TryGetProperty("arrival_time", out var arrTime) ? arrTime.GetString() ?? string.Empty : string.Empty,
-                                        departureTime = trip.TryGetProperty("departure_time", out var depTime) ? depTime.GetString() ?? string.Empty : string.Empty,
+                                        departureTime = trip.TryGetProperty("departure_time", out var depTime2) ? depTime2.GetString() ?? string.Empty : string.Empty,
                                         directionId = trip.TryGetProperty("direction_id", out var dirId) ? dirId.GetInt32() : 0,
                                         dropOffType = 0, 
                                         pickupType = 0, 
                                         routeId = trip.GetProperty("route_id").GetString() ?? string.Empty,
-                                        serviceDate = trip.TryGetProperty("service_date", out var servDate) ? servDate.GetString() ?? string.Empty : DateTime.Now.ToString("yyyy-MM-dd"),
+                                        serviceDate = trip.TryGetProperty("service_date", out var servDate) ? servDate.GetString() ?? string.Empty : string.Empty,
                                         shapeId = trip.TryGetProperty("shape_id", out var shId) ? shId.GetString() ?? string.Empty : string.Empty,
                                         stopHeadSign = trip.TryGetProperty("trip_headsign", out var headSign) ? headSign.GetString() ?? string.Empty : string.Empty,
                                         stopId = stopIdInput,
@@ -195,6 +196,40 @@ namespace safe_travels.API.AucklandTransportAPI
         /// Gets or sets the start time of the trip.
         /// </summary>
         public required string tripStartTime { get; set; }
+
+        /// <summary>
+        /// Gets the minutes until bus arrival. Returns the countdown if the trip has started (tripStartTime is in the past),
+        /// otherwise returns null.
+        /// </summary>
+        public int? MinutesUntilArrival
+        {
+            get
+            {
+                return CountdownFormatter.CalculateMinutesUntilArrival(arrivalTime, tripStartTime, serviceDate);
+            }
+        }
+
+        /// <summary>
+        /// Gets a formatted string showing the countdown to arrival (for BusDetailPage).
+        /// </summary>
+        public string ArrivalCountdown
+        {
+            get
+            {
+                return CountdownFormatter.FormatBusArrival(MinutesUntilArrival);
+            }
+        }
+
+        /// <summary>
+        /// Gets a formatted string showing when to hop off at this stop (for TripStopsPage).
+        /// </summary>
+        public string HopOffCountdown
+        {
+            get
+            {
+                return CountdownFormatter.FormatHopOff(MinutesUntilArrival);
+            }
+        }
 
         public override string ToString()
         {
