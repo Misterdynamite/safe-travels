@@ -1,129 +1,163 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:maps="clr-namespace:Microsoft.Maui.Controls.Maps;assembly=Microsoft.Maui.Controls.Maps"
-             x:Class="safe_travels.Views.MapPage"
-             Title="Map">
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Settings"
-                     SemanticProperties.Description="Settings"
-                     SemanticProperties.Hint="Open to the Settings Page"
-                     Clicked="OnSettingsClicked"
-                     Priority="0"
-                     Order="Primary" />
-    </ContentPage.ToolbarItems>
+            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+            xmlns:maps="clr-namespace:Microsoft.Maui.Controls.Maps;assembly=Microsoft.Maui.Controls.Maps"
+            x:Class="safe_travels.Views.MapPage"
+            Title="Map">
+<ContentPage.ToolbarItems>
+    <ToolbarItem Text="Settings"
+                    SemanticProperties.Description="Settings"
+                    SemanticProperties.Hint="Open to the Settings Page"
+                    Clicked="OnSettingsClicked"
+                    Priority="0"
+                    Order="Primary" />
+</ContentPage.ToolbarItems>
 
-    <Grid>
-        <Grid x:Name="NormalView">
-            <Grid RowDefinitions="Auto,* ,80">
-                <!-- Controls at the top -->
-                <VerticalStackLayout Grid.Row="0" Padding="0,0,0,4">
-                    <Picker x:Name="StopModePicker"
-                    Title="Show stops by..."
-                    SemanticProperties.Description="Tap to choose how to view Stops"
-                    SelectedIndexChanged="OnStopModeChanged"
-                    Margin="10">
-                        <Picker.Items>
-                            <x:String>Nearby Stops</x:String>
-                            <x:String>Search by Name</x:String>
-                        </Picker.Items>
-                    </Picker>
-                    <SearchBar x:Name="StopSearchBar"
-                       SemanticProperties.Description="Stop Search Bar"
-                       Placeholder="Search for a stop..."
-                       IsVisible="False"
-                       SearchButtonPressed="OnStopSearch"/>
-                    <Button Text="Journey Planner"
-                    Margin="10,0,10,0"
-                    Clicked="OnJourneyPlannerClicked"
-                    HorizontalOptions="FillAndExpand"/>
-                </VerticalStackLayout>
+<Grid>
+    <Grid x:Name="NormalView"
+            IsVisible="True"
+    RowDefinitions="Auto,*,Auto">
+        <!-- Controls at the top -->
+            <VerticalStackLayout Grid.Row="0" Padding="0,0,0,4">
+                <Picker x:Name="StopModePicker"
+                Title="Show stops by..."
+                SemanticProperties.Description="Tap to choose how to view Stops"
+                SelectedIndexChanged="OnStopModeChanged"
+                Margin="10">
+                    <Picker.Items>
+                        <x:String>Nearby Stops</x:String>
+                        <x:String>Search by Name</x:String>
+                    </Picker.Items>
+                </Picker>
+                <SearchBar x:Name="StopSearchBar"
+                    SemanticProperties.Description="Stop Search Bar"
+                    Placeholder="Search for a stop..."
+                    IsVisible="False"
+                    SearchButtonPressed="OnStopSearch"/>
+                <Button Text="Journey Planner"
+                Margin="10,0,10,0"
+                Clicked="OnJourneyPlannerClicked"
+                HorizontalOptions="FillAndExpand"/>
+            </VerticalStackLayout>
 
-                <!-- Map fills all available space -->
-                <maps:Map x:Name="StopMap"
-                  MapType="Street"
-                  IsShowingUser="True"
-                  Grid.Row="1"
-                  VerticalOptions="FillAndExpand"
-                  HorizontalOptions="FillAndExpand" />
-
-                <!-- Horizontal list of favorite stops at the bottom -->
-                <CollectionView x:Name="FavoriteStopsCollection"
-                        ItemsLayout="HorizontalList"
-                        SelectionMode="Single"
-                        HeightRequest="80"
-                        Margin="10"
-                        SelectionChanged="OnFavoriteStopSelected"
-                        Grid.Row="2">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <Border Background="{DynamicResource CardBackgroundColor}" StrokeShape="RoundRectangle 8" Margin="4" Padding="8">
-                                <VerticalStackLayout>
-                                    <Label Text="{Binding stopName}" FontSize="16" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}"/>
-                                    <Label Text="{Binding stopId}" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}"/>
-                                </VerticalStackLayout>
-                            </Border>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </Grid>
+            <!-- Map fills all available space -->
+            <maps:Map x:Name="StopMap"
+                MapType="Street"
+                Grid.Row="1"
+        
+                    IsShowingUser="True"
+                    VerticalOptions="FillAndExpand"
+                    HorizontalOptions="FillAndExpand"
+                    />
+        <BoxView Grid.Row="2" HeightRequest="1" Color="#DDDDDD" VerticalOptions="Start"/>
+        <!-- Horizontal list of favorite stops at the bottom -->
+        <CollectionView x:Name="FavoriteStopsCollection"
+                    Grid.Row="2"
+                    ItemsLayout="HorizontalList"
+                    SelectionMode="Single"
+                    HeightRequest="80"
+                    Margin="10"
+                    SelectionChanged="OnFavoriteStopSelected">
+            <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="{DynamicResource CardBackgroundColor}" StrokeShape="RoundRectangle 8" Margin="4" Padding="8">
+                            <VerticalStackLayout>
+                                <Label Text="{Binding stopName}" FontSize="16" FontAttributes="Bold" TextColor="{DynamicResource PrimaryTextColor}"/>
+                                <Label Text="{Binding stopId}" FontSize="12" TextColor="{DynamicResource SecondaryTextColor}"/>
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
         </Grid>
 
-        <ScrollView x:Name="AccessibilityView"
-                    IsVisible="False"
-                    Padding="20"
-                    BackgroundColor="{DynamicResource PageBackgroundColor}">
-        <VerticalStackLayout Spacing="16">
-            <Label Text="Accessibility Mode Active"
-                       FontSize="Large"
-                       FontAttributes="Bold"
-                       SemanticProperties.Description="Accessibility mode is active" />
+    <ScrollView x:Name="AccessibilityView"
+                IsVisible="False"
+                Padding="25"
+                BackgroundColor="{DynamicResource PageBackgroundColor}">
+    <VerticalStackLayout Spacing="16">
+        <Label Text="Accessibility Mode Active"
+                    FontSize="28"
+                    FontAttributes="Bold"
+                    HorizontalOptions="Center"
+                    SemanticProperties.Description="Accessibility mode is active" />
 
-            <Label Text="Map view hidden for screen reader users. Use buttons below to navigate."
-                       FontSize="Medium"
-                       SemanticProperties.Description="Instructions for screen reader users" />
+        <Label Text="Map view hidden for screen reader users. Use buttons below to navigate."
+                    FontSize="20"
+                    SemanticProperties.Description="Map view hidden for screen reader users. Use buttons below to navigate" />
 
-            <Button Text="Nearby Stops"
-                        Clicked="OnNearbyStopsButtonClicked"
-                        SemanticProperties.Description="Show nearby bus stops" />
+        <Button Text="Nearby Stops"
+                    FontSize="22"
+                    FontAttributes="Bold"
+                    HeightRequest="80"
+                    WidthRequest="320"
+                    CornerRadius="15"                    
+                    Clicked="OnNearbyStopsButtonClicked"
+                    SemanticProperties.Description="Show nearby bus stops" />
 
-            <Button Text="Search Stops by Name"
-                        Clicked="OnSearchStopsButtonClicked"
-                        SemanticProperties.Description="Search stops by name" />
+        <Button Text="Search Stops by Name"
+                    FontSize="22"
+                    FontAttributes="Bold"
+                    HeightRequest="80"
+                    WidthRequest="320"
+                    CornerRadius="15"
+                    Clicked="OnSearchStopsButtonClicked"
+                    SemanticProperties.Description="Search stops by name" />
 
-                <CollectionView x:Name="AccessibleStopsList"
-                        IsVisible="True"
-                        SelectionMode="Single"
-                        SelectionChanged="OnAccessibleStopSelected"
-                        SemanticProperties.Description="List of bus stops">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <Border Background="{DynamicResource CardBackgroundColor}"
-                            StrokeShape="RoundRectangle 8"
-                            Margin="4"
-                            Padding="8">
-                                <VerticalStackLayout>
-                                    <Label Text="{Binding stopName}"
-                                   FontSize="16"
-                                   FontAttributes="Bold"
-                                   SemanticProperties.Description="{Binding stopName}" />
-                                    <Label Text="{Binding stopId}"
-                                   FontSize="12"
-                                   SemanticProperties.Description="{Binding stopId}" />
-                                </VerticalStackLayout>
-                            </Border>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-
+            <CollectionView x:Name="AccessibleStopsList"
+                    IsVisible="True"
+                    SelectionMode="Single"
+                    SelectionChanged="OnAccessibleStopSelected"
+                    SemanticProperties.Description="List of bus stops">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="{DynamicResource CardBackgroundColor}"
+                        StrokeShape="RoundRectangle 8"
+                        
+                        WidthRequest="310"
+                        Margin="4"
+                        Padding="8">
+                            <VerticalStackLayout>
+                                <Label Text="{Binding stopName}"
+                                FontSize="22"
+                                FontAttributes="Bold"
+                                SemanticProperties.Description="{Binding stopName}" />
+                                <Label Text="{Binding stopId}"
+                                FontSize="20"
+                                SemanticProperties.Description="{Binding stopId}" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+                <Button x:Name="ShowMoreButton"
+        Text="Show More Stops"
+        FontSize="22"
+        FontAttributes="Bold"
+        HeightRequest="80"
+        WidthRequest="320"
+        CornerRadius="15"
+        IsVisible="False"
+        Clicked="OnShowMoreClicked"
+        SemanticProperties.Description="Load more nearby bus stops" />
                 <Button Text="Journey Planner"
-                        Clicked="OnJourneyPlannerClicked"
-                        SemanticProperties.Description="Open journey planner" />
+                    FontSize="22"
+                    FontAttributes="Bold"
+                    HeightRequest="80"
+                    WidthRequest="320"
+                    CornerRadius="15"
+                    Clicked="OnJourneyPlannerClicked"
+                    SemanticProperties.Description="Open journey planner" />
 
-            <Button Text="Settings"
-                        Clicked="OnSettingsClicked"
-                        SemanticProperties.Description="Open settings page" />
-        </VerticalStackLayout>
-    </ScrollView>
+        <Button Text="Settings"
+                FontSize="22"
+                FontAttributes="Bold"
+                HeightRequest="80"
+                WidthRequest="320"
+                CornerRadius="15"
+                Clicked="OnSettingsClicked"
+                SemanticProperties.Description="Open settings page" />
+    </VerticalStackLayout>
+</ScrollView>
 </Grid>
 </ContentPage>
