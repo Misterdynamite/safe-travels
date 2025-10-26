@@ -3,7 +3,7 @@ using Microsoft.Maui;
 using safe_travels.API.AucklandTransportAPI;
 using safe_travels.Views;
 using Microsoft.Maui.Storage;
-
+using safe_travels.Utilities;
 
 public partial class App : Application
 {
@@ -22,6 +22,11 @@ public partial class App : Application
         {
             ThemeHelper.SetTheme(AppTheme.Light);
         }
+
+        // Load persisted accessibility mode like theme
+        const string AccessibilityModePrefKey = "AccessibilityMode";
+        bool isAccessibilityMode = Preferences.Get(AccessibilityModePrefKey, false);
+        AppSettings.IsAccessibilityMode = isAccessibilityMode;
 
         // Wrap your starting page in a NavigationPage
         MainPage = new NavigationPage(new MapPage());

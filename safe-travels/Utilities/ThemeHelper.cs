@@ -1,4 +1,4 @@
-namespace safe_travels.Views;
+namespace safe_travels.Utilities;
 
 public static class ThemeHelper
 {

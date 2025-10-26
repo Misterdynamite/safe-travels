@@ -65,7 +65,7 @@ public partial class TrainDetailPage : ContentPage
         private void OnSaveStopClicked(object sender, EventArgs e)
     {
 
-        var stop = new Stop
+        var stop = new Models.FavoriteStop
         {
             stopId = _stopId,
             stopName = _stopName,
