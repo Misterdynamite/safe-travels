@@ -1,0 +1,20 @@
+[Unit]
+Description=Auckland Transport API Server
+After=network.target postgresql.service
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/at_api
+Environment="PYTHONUNBUFFERED=1"
+Environment="PATH=/opt/at_api/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin"
+ExecStart=/opt/at_api/venv/bin/python /opt/at_api/api_server.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
