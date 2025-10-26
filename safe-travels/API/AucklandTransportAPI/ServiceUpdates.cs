@@ -1,197 +1,199 @@
 ﻿using safe_travels.API.AucklandTransportAPI;
+using safe_travels.API.AucklandTransportAPI.Legacy;
 using System.Text.Json;
+using System.Diagnostics;
 
 namespace API_Tester.AucklandTransportAPI
 {
+    /// <summary>
+    /// Provides methods to fetch service alerts and check service status,
+    /// with automatic fallback from new API to legacy API if needed.
+    /// </summary>
     class ServiceUpdates
     {
-        /// <summary>
-        /// The base URL for the Auckland Transport trips API.
-        /// </summary>
-        private static readonly string apiURL = $"https://api.at.govt.nz/realtime/legacy/servicealerts";
-
+        private static readonly ServiceAlertsAPI _serviceAlertsCaller = new ServiceAlertsAPI();
+        private static readonly LegacyServiceAlertsAPI _legacyServiceAlertsCaller = new LegacyServiceAlertsAPI();
 
         /// <summary>
-        /// The subscription key required for authenticating API requests.
+        /// Gets service alerts for a specific stop ID using the new Auckland Transport API,
+        /// with fallback to the legacy API if necessary.
         /// </summary>
-        private static readonly string subscriptionKey = "25c926c6234a49c98d52d90a8bd7ac7e";
-
-        /// <summary>
-        /// Gets service alerts for a specific stop ID using the Auckland Transport Legacy API.
-        /// </summary>
-        /// <param name="stopIdInput"></param>
-        /// <returns></returns>
-        public async Task<List<ServiceAlert>> GetLegacyServiceAlertsAsync(string stopIdInput)
+        /// <param name="stopId">The stop ID to get alerts for.</param>
+        /// <returns>A list of service alerts affecting the specified stop.</returns>
+        public async Task<List<ServiceAlert>> GetServiceAlertsByStopAsync(string stopId)
         {
+            List<ServiceAlert> alerts = new List<ServiceAlert>();
+
             try
             {
-                using var client = new HttpClient();
-                client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
-                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", subscriptionKey);
-                client.DefaultRequestHeaders.Add("Accept", "application/json");
-
-                var response = await client.GetAsync(apiURL); // legacy endpoint
-                response.EnsureSuccessStatusCode();
-                var content = await response.Content.ReadAsStringAsync();
-
-                using var doc = JsonDocument.Parse(content);
-                var root = doc.RootElement;
-                var alerts = new List<ServiceAlert>();
-
-                if (root.TryGetProperty("response", out var responseObj) &&
-                    responseObj.TryGetProperty("entity", out var entityArray))
+                Debug.WriteLine($"Attempting to fetch service alerts for stop {stopId} using new API...");
+                alerts = await _serviceAlertsCaller.GetAlertsByStopIdAsync(stopId);
+                
+                if (alerts != null && alerts.Count > 0)
                 {
-
-                    foreach (var entity in entityArray.EnumerateArray())
-                    {
-                        if (!entity.TryGetProperty("alert", out var alertObj)) continue;
-
-                        var headerText = alertObj.GetProperty("header_text")
-                            .GetProperty("translation")[0].GetProperty("text").GetString();
-
-                        var descriptionText = alertObj.GetProperty("description_text")
-                            .GetProperty("translation")[0].GetProperty("text").GetString();
-
-                        var activePeriods = new List<AlertPeriod>();
-                        foreach (var period in alertObj.GetProperty("active_period").EnumerateArray())
-                        {
-                            activePeriods.Add(new AlertPeriod
-                            {
-                                Start = period.TryGetProperty("start", out var start) && start.ValueKind == JsonValueKind.Number
-                                    ? start.GetInt64()
-                                    : 0,
-                                End = period.TryGetProperty("end", out var end) && end.ValueKind == JsonValueKind.Number
-                                    ? end.GetInt64()
-                                    : 0
-                            });
-                        }
-
-                        var entities = new List<AlertEntity>();
-                        foreach (var informed in alertObj.GetProperty("informed_entity").EnumerateArray())
-                        {
-                            var stopId = informed.TryGetProperty("stop_id", out var stopIdProp) ? stopIdProp.GetString() ?? "" : "";
-
-                            if (!string.IsNullOrEmpty(stopIdInput) &&
-                                !stopId.Equals(stopIdInput, StringComparison.OrdinalIgnoreCase))
-                                continue;
-
-                            entities.Add(new AlertEntity
-                            {
-                                StopId = stopId,
-                                RouteId = informed.TryGetProperty("route_id", out var routeId) ? routeId.GetString() ?? "" : "",
-                                AgencyId = ""
-                            });
-                        }
-                        if (entities.Count > 1)
-                        {
-                            alerts.Add(new ServiceAlert
-                            {
-                                Id = entity.GetProperty("id").GetString() ?? "",
-                                Header = headerText ?? "",
-                                Description = descriptionText ?? "",
-                                ActivePeriods = activePeriods,
-                                Entities = entities
-                            });
-                        }
-                    }
-
+                    Debug.WriteLine($"Successfully fetched {alerts.Count} alerts using new API");
                 }
-
-                Console.WriteLine($"Fetched {alerts.Count} service alerts from Legacy API");
-                return alerts;
+                else
+                {
+                    throw new Exception("New API returned no results");
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching service alerts: {ex.Message}");
-                return new List<ServiceAlert>();
-            }
-        }
-        public class ServiceAlert
-        {
-            public string Id { get; set; }
-            public string Header { get; set; }
-            public string Description { get; set; }
-            public List<AlertPeriod> ActivePeriods { get; set; }
-            public List<AlertEntity> Entities { get; set; }
-        }
-
-        public class AlertPeriod
-        {
-            public long Start { get; set; }
-            public long End { get; set; }
-        }
-
-        public class AlertEntity
-        {
-            public string AgencyId { get; set; }
-            public string RouteId { get; set; }
-            public string StopId { get; set; }
-        }
-
-        //Function to check if a train LINE is running
-        public bool isTrainRunning(TripStopAttributes trip, List<ServiceAlert> alerts, DateTime now, String agencyId = "")
-        {
-            //first check service date
-            if (!DateTime.TryParse(trip.serviceDate, out DateTime serviceDate) || serviceDate.Date != now.Date)
-                return false;
-
-            //check pickup / dropoff
-            if (trip.pickupType != 0 || trip.dropOffType != 0)
-                return false;
-
-            //check time window
-            if (!DateTime.TryParse(trip.tripStartTime, out DateTime tripStart) || !DateTime.TryParse(trip.arrivalTime, out DateTime arrival))
-                return false;
-
-            if (now.TimeOfDay < tripStart.TimeOfDay || now.TimeOfDay > arrival.TimeOfDay)
-                return false;
-
-            //check service alert
-            foreach (var alert in alerts)
-            {
-                if (isAlertActive(alert, now, trip.routeId, trip.stopId, agencyId))
-                    return false;
-            }
-
-
-
-            return true;
-
-        }
-
-
-        private bool isAlertActive(
-            ServiceAlert alert,
-            DateTime now,
-            string routeId,
-            string stopId,
-            string agencyId)
-        {
-            foreach (var period in alert.ActivePeriods)
-            {
-                DateTime start = DateTimeOffset.FromUnixTimeSeconds(period.Start).DateTime;
-                DateTime end = DateTimeOffset.FromUnixTimeSeconds(period.End).DateTime;
-                if (now >= start && now <= end)
+                Debug.WriteLine($"New API failed: {ex.Message}. Falling back to legacy API...");
+                
+                try
                 {
-                    //check if alert affects the route/stop/agency
-                    foreach (var entity in alert.Entities)
+                    var legacyAlerts = await _legacyServiceAlertsCaller.GetServiceAlertsAsync(stopId);
+                    alerts = ConvertLegacyAlerts(legacyAlerts);
+                    
+                    if (alerts != null && alerts.Count > 0)
                     {
-                        if ((!string.IsNullOrEmpty(entity.RouteId) && entity.RouteId == routeId) ||
-                            (!string.IsNullOrEmpty(entity.StopId) && entity.StopId == stopId) ||
-                            (!string.IsNullOrEmpty(entity.AgencyId) && entity.AgencyId == agencyId))
-                        {
-                            return true;
-                        }
+                        Debug.WriteLine($"Successfully fetched {alerts.Count} alerts using legacy API");
+                    }
+                    else
+                    {
+                        Debug.WriteLine("Legacy API also returned no results");
+                        alerts = new List<ServiceAlert>();
                     }
                 }
+                catch (Exception legacyEx)
+                {
+                    Debug.WriteLine($"Legacy API also failed: {legacyEx.Message}");
+                    alerts = new List<ServiceAlert>();
+                }
             }
-            return false;
 
+            return alerts;
         }
 
+        /// <summary>
+        /// Gets service alerts for a specific route ID using the new Auckland Transport API,
+        /// with fallback to the legacy API if necessary.
+        /// </summary>
+        /// <param name="routeId">The route ID to get alerts for.</param>
+        /// <returns>A list of service alerts affecting the specified route.</returns>
+        public async Task<List<ServiceAlert>> GetServiceAlertsByRouteAsync(string routeId)
+        {
+            List<ServiceAlert> alerts = new List<ServiceAlert>();
+
+            try
+            {
+                Debug.WriteLine($"Attempting to fetch service alerts for route {routeId} using new API...");
+                alerts = await _serviceAlertsCaller.GetAlertsByRouteIdAsync(routeId);
+                
+                if (alerts != null && alerts.Count > 0)
+                {
+                    Debug.WriteLine($"Successfully fetched {alerts.Count} alerts using new API");
+                }
+                else
+                {
+                    throw new Exception("New API returned no results");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"New API failed: {ex.Message}. Falling back to legacy API...");
+                
+                try
+                {
+                    // Legacy API doesn't have route-specific endpoint, so get all alerts
+                    var legacyAlerts = await _legacyServiceAlertsCaller.GetServiceAlertsAsync("");
+                    alerts = ConvertLegacyAlerts(legacyAlerts);
+                    
+                    // Filter by route ID
+                    alerts = alerts.Where(a => a.Entities.Any(e => e.RouteId == routeId)).ToList();
+                    
+                    if (alerts != null && alerts.Count > 0)
+                    {
+                        Debug.WriteLine($"Successfully fetched {alerts.Count} alerts using legacy API");
+                    }
+                    else
+                    {
+                        Debug.WriteLine("Legacy API also returned no results");
+                        alerts = new List<ServiceAlert>();
+                    }
+                }
+                catch (Exception legacyEx)
+                {
+                    Debug.WriteLine($"Legacy API also failed: {legacyEx.Message}");
+                    alerts = new List<ServiceAlert>();
+                }
+            }
+
+            return alerts;
+        }
+
+        /// <summary>
+        /// Converts legacy service alerts to the new ServiceAlert format.
+        /// </summary>
+        private List<ServiceAlert> ConvertLegacyAlerts(List<LegacyServiceAlertsAPI.ServiceAlert> legacyAlerts)
+        {
+            var alerts = new List<ServiceAlert>();
+            
+            foreach (var legacy in legacyAlerts)
+            {
+                var alert = new ServiceAlert
+                {
+                    Id = legacy.Id,
+                    Header = legacy.Header,
+                    Description = legacy.Description,
+                    ActivePeriods = new List<AlertPeriod>(),
+                    Entities = new List<AlertEntity>()
+                };
+
+                // Convert active periods
+                foreach (var period in legacy.ActivePeriods)
+                {
+                    alert.ActivePeriods.Add(new AlertPeriod
+                    {
+                        Start = period.Start,
+                        End = period.End
+                    });
+                }
+
+                // Convert entities
+                foreach (var entity in legacy.Entities)
+                {
+                    alert.Entities.Add(new AlertEntity
+                    {
+                        AgencyId = entity.AgencyId,
+                        RouteId = entity.RouteId,
+                        StopId = entity.StopId
+                    });
+                }
+
+                alerts.Add(alert);
+            }
+
+            return alerts;
+        }
+
+        /// <summary>
+        /// Checks if a service (trip) is currently running based on service alerts and schedule.
+        /// </summary>
+        /// <param name="trip">The trip stop attributes to check.</param>
+        /// <param name="alerts">The list of service alerts to check against.</param>
+        /// <param name="now">The current date/time.</param>
+        /// <param name="agencyId">The agency ID (optional).</param>
+        /// <returns>True if the service is running, false otherwise.</returns>
+        public bool IsServiceRunning(TripStopAttributes trip, List<ServiceAlert> alerts, DateTime now, string agencyId = "")
+        {
+            return _serviceAlertsCaller.IsServiceRunning(trip, alerts, now, agencyId);
+        }
+
+        /// <summary>
+        /// Checks if a specific alert is currently active and affects the given route/stop/agency.
+        /// </summary>
+        /// <param name="alert">The service alert to check.</param>
+        /// <param name="now">The current date/time.</param>
+        /// <param name="routeId">The route ID to check against (optional).</param>
+        /// <param name="stopId">The stop ID to check against (optional).</param>
+        /// <param name="agencyId">The agency ID to check against (optional).</param>
+        /// <returns>True if the alert is active and affects the specified entities.</returns>
+        public bool IsAlertActive(ServiceAlert alert, DateTime now, string routeId = "", string stopId = "", string agencyId = "")
+        {
+            return _serviceAlertsCaller.IsAlertActive(alert, now, routeId, stopId, agencyId);
+        }
     }
-
-    
-  
-
 }
