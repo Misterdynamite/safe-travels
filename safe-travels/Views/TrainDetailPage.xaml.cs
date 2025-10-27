@@ -1,6 +1,6 @@
-using API_Tester.AucklandTransportAPI;
 using Microsoft.Maui.Controls;
 using safe_travels.API.AucklandTransportAPI;
+using safe_travels.Models;
 using safe_travels.Utilities;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
@@ -36,11 +36,11 @@ public partial class TrainDetailPage : ContentPage
         _stopId = selectedTrip.attributes.stopId;
         _stopName = selectedTrip.attributes.stopHeadSign;
 
+            // Get service alerts for the stop (with automatic fallback)
+            var alerts = await AucklandTransportAPIClient.GetServiceAlertsForStop(selectedTrip.attributes.stopId);
 
-            var service = new ServiceUpdates();
-            var alerts = await service.GetLegacyServiceAlertsAsync(selectedTrip.attributes.stopId);
-
-            bool isRunning = service.isTrainRunning(
+            // Check if the service is running
+            bool isRunning = AucklandTransportAPIClient.IsServiceRunning(
                 selectedTrip.attributes,
                 alerts,
                 DateTime.Now,
@@ -58,7 +58,7 @@ public partial class TrainDetailPage : ContentPage
         private void OnSaveStopClicked(object sender, EventArgs e)
     {
 
-        var stop = new Stop
+        var stop = new Models.FavoriteStop
         {
             stopId = _stopId,
             stopName = _stopName,
@@ -86,6 +86,10 @@ public partial class TrainDetailPage : ContentPage
     }
 
 }
+
+
+
+
 
 
 

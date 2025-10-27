@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace safe_travels.Views
+namespace safe_travels.Utilities
 {
-    class AppSettings
+    public static class AppSettings
     {
         public static bool IsAccessibilityMode { get; set; } = false;
     }
