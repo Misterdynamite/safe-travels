@@ -1,0 +1,358 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="safe_travels.App">
+    <Position X="5.25" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>App.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="safe_travels.AppShell">
+    <Position X="2.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAA=</HashCode>
+      <FileName>AppShell.xaml.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="App" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="safe_travels.MauiProgram">
+    <Position X="5.25" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAA=</HashCode>
+      <FileName>MauiProgram.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="App" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="safe_travels.Utilities.AccessibilityHelper">
+    <Position X="4.25" Y="16" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAA=</HashCode>
+      <FileName>Utilities\AccessibilityHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="safe_travels.Utilities.AppSettings">
+    <Position X="2.5" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAA=</HashCode>
+      <FileName>Utilities\AppSettings.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="App" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="safe_travels.Utilities.CountdownFormatter">
+    <Position X="33" Y="15.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAIAAAAAAAAAAAAAAAAAAAAAAACBAAAAAAAA=</HashCode>
+      <FileName>Utilities\CountdownFormatter.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="TripStopData" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="safe_travels.Utilities.FavoriteBusManager">
+    <Position X="7" Y="16" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAkgAAAAAgBAAAAAAAIAAAAAAAAAEAABAAA=</HashCode>
+      <FileName>Utilities\FavoriteBusManager.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="FavoriteStop" />
+      <Property Name="MapPage" />
+      <Property Name="BusDetailPage" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="safe_travels.Utilities.ThemeHelper">
+    <Position X="8.25" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAA=</HashCode>
+      <FileName>Utilities\ThemeHelper.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="App" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="safe_travels.Models.Stop" Collapsed="true">
+    <Position X="33.25" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAEAAEAAAAAQACCABIAAAAAAAAAAAAgA=</HashCode>
+      <FileName>Models\Stop.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="StopsAPI" />
+      <Property Name="TripStopsAPI" />
+      <Property Name="LegacyStopsAPI" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="safe_travels.Models.FavoriteStop">
+    <Position X="7.5" Y="19" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAAAAEAEAAAAAAQAiCABAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>Models\FavoriteStop.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="safe_travels.Models.ServiceAlert">
+    <Position X="33.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAACAAAAAAAgAAAAAACAAAIAAAAAAAABAAEAAAAAAAA=</HashCode>
+      <FileName>Models\ServiceAlert.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="ServiceAlertsAPI" />
+      <Property Name="LegacyServiceAlertsAPI" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="safe_travels.Models.AlertPeriod">
+    <Position X="36.5" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\ServiceAlert.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="ServiceAlert" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="safe_travels.Models.AlertEntity">
+    <Position X="36.5" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABEAAAAAQAAAAAAAAAAAEAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\ServiceAlert.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="ServiceAlert" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="safe_travels.Models.TripData" Collapsed="true">
+    <Position X="33.25" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAABMAAAAAAAAAAABgA=</HashCode>
+      <FileName>Models\TripData.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="TripsAPI" />
+      <Property Name="LegacyTripsAPI" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="safe_travels.Models.TripAttributes" Collapsed="true">
+    <Position X="36.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABEAAAAEAAAAgIAAAgAAAAAAAAAAAECAAAAAQAAAAA=</HashCode>
+      <FileName>Models\TripData.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="TripData" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="safe_travels.Models.TripStopResponse">
+    <Position X="33.25" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>Models\TripStopData.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="InboundTripsAPI" />
+      <Property Name="LegacyInboundTripsAPI" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="safe_travels.Models.TripStopData">
+    <Position X="33.25" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAABEAQAAAAAAAAAAgA=</HashCode>
+      <FileName>Models\TripStopData.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="TripStopResponse" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="safe_travels.Models.TripStopAttributes">
+    <Position X="36.5" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABEAACgEAAAAgAEABACAAUAABAAAANiAAAAAQAAAAA=</HashCode>
+      <FileName>Models\TripStopData.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="TripStopData" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="safe_travels.API.AucklandTransportAPI.Legacy.LegacyInboundTripsAPI">
+    <Position X="20.75" Y="5.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAAQQAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>API\AucklandTransportAPI\Legacy\LegacyInboundTripsAPI.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="safe_travels.API.AucklandTransportAPI.Legacy.LegacyServiceAlertsAPI">
+    <Position X="27" Y="3.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAAQAAAAAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>API\AucklandTransportAPI\Legacy\LegacyServiceAlertsAPI.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="safe_travels.API.AucklandTransportAPI.Legacy.LegacyStopsAPI">
+    <Position X="24" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAgAgAAAAAAAQAAAAAAAAAAAAAIAAAAAAAAA=</HashCode>
+      <FileName>API\AucklandTransportAPI\Legacy\LegacyStopsAPI.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="safe_travels.API.AucklandTransportAPI.Legacy.LegacyTripsAPI">
+    <Position X="30.25" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAAQAAAEAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>API\AucklandTransportAPI\Legacy\LegacyTripsAPI.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="safe_travels.API.AucklandTransportAPI.AucklandTransportAPIClient">
+    <Position X="18" Y="8" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>FAAAgAAAuCAICCIAEABAABIECAAUYIQBAAAAAAABBAA=</HashCode>
+      <FileName>API\AucklandTransportAPI\AucklandTransportAPIClient.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="LegacyInboundTripsAPI" />
+      <Property Name="InboundTripsAPI" />
+      <Property Name="StopsAPI" />
+      <Property Name="ServiceAlertsAPI" />
+      <Property Name="TripsAPI" />
+      <Property Name="TripStopsAPI" />
+      <Property Name="LegacyStopsAPI" />
+      <Property Name="LegacyServiceAlertsAPI" />
+      <Property Name="LegacyTripsAPI" />
+      <Property Name="JourneyPlannerPage" />
+      <Property Name="BusDetailPage" />
+      <Property Name="MapPage" />
+      <Property Name="TripStopsPage" />
+      <Property Name="TrainDetailPage" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="safe_travels.API.AucklandTransportAPI.InboundTripsAPI">
+    <Position X="20.5" Y="14.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAQQAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>API\AucklandTransportAPI\InboundTripsAPI.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="safe_travels.API.AucklandTransportAPI.ServiceAlertsAPI">
+    <Position X="25.75" Y="14.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAQACAAAAAAAAAQAAAAgAAEAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>API\AucklandTransportAPI\ServiceAlertsAPI.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="safe_travels.API.AucklandTransportAPI.StopsAPI">
+    <Position X="23.25" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAgAAAAAAAAAQAAAAAAAAAAAAAIAAAAAAAAA=</HashCode>
+      <FileName>API\AucklandTransportAPI\StopsAPI.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="safe_travels.API.AucklandTransportAPI.TripsAPI">
+    <Position X="29.25" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAQAAAEAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>API\AucklandTransportAPI\TripsAPI.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="safe_travels.API.AucklandTransportAPI.TripStopsAPI">
+    <Position X="31" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>API\AucklandTransportAPI\TripStopsAPI.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="safe_travels.API.LocationIQ.LocationIQAPI">
+    <Position X="14.5" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABCAAAAEAAAAAABAAAAAAAAAAAAgAAAAAAAAAAAAAA=</HashCode>
+      <FileName>API\LocationIQ\LocationIQAPI.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="JourneyPlannerPage" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="safe_travels.API.LocationIQ.LocationIQSuggestion">
+    <Position X="13.75" Y="4.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAAAAAAAAAAACAAAACAAAAAAAAAAAAAAEAA=</HashCode>
+      <FileName>API\LocationIQ\LocationIQAPI.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="LocationIQAPI" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="safe_travels.API.LocationIQ.LocationIQGeocodeResult">
+    <Position X="16" Y="4.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAAAAAAAAAAACAAAACAAAAAAAAAAAAAAEAA=</HashCode>
+      <FileName>API\LocationIQ\LocationIQAPI.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="LocationIQAPI" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="safe_travels.Views.BusDetailPage">
+    <Position X="9.25" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>LAAAAAAICCgAgCAAAEAAACAAEAAAAIAAEEIAAAIgAAA=</HashCode>
+      <FileName>Views\BusDetailPage.xaml.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="App" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="safe_travels.Views.JourneyPlannerPage">
+    <Position X="11.25" Y="8.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>QAAEIABAQAgACAAIAAAAIMSAABBAAAACCIAkAEAgBAA=</HashCode>
+      <FileName>Views\JourneyPlannerPage.xaml.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="App" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="safe_travels.Views.MapPage">
+    <Position X="5.25" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EIEiABAAAAgABABgIkABABICCGEAEgAAAACCQQCgAAA=</HashCode>
+      <FileName>Views\MapPage.xaml.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="App" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="safe_travels.Views.SettingsPage">
+    <Position X="7.25" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BCQAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAgAAA=</HashCode>
+      <FileName>Views\SettingsPage.xaml.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="App" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="safe_travels.Views.TrainDetailPage">
+    <Position X="0.75" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAAgCAAAAAAACAAAAACACAAAAIAAAAgAAA=</HashCode>
+      <FileName>Views\TrainDetailPage.xaml.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="App" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="safe_travels.Views.TripStopsPage">
+    <Position X="2.75" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAKAAQAAAEAEIAAAAAEAEAAAAAEEIAAAEgAAA=</HashCode>
+      <FileName>Views\TripStopsPage.xaml.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="App" />
+    </ShowAsAssociation>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
