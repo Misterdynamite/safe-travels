@@ -166,7 +166,7 @@
                                 SelectionMode="Single"
                                 SelectionChanged="OnFavoriteStopSelected"
                                 SemanticProperties.Description="Saved favorite stops"
-                                HeightRequest="150">
+                                HeightRequest="200">
                     <CollectionView.ItemsLayout>
                         <LinearItemsLayout Orientation="Vertical" />
                     </CollectionView.ItemsLayout>
@@ -181,9 +181,9 @@
                                            FontSize="25"
                                            FontAttributes="Bold"
                                            SemanticProperties.Description="{Binding DisplayLabel}" />
-                                        <Label Text=" " FontSize="2"/>
+                                        
                                     </VerticalStackLayout>
-                            </Border>
+                                </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
@@ -206,12 +206,11 @@
                                     Margin="4"
                                     Padding="4">
                                     <VerticalStackLayout>
-                                    <Label Text="{Binding stopName}"
+                                        <Label Text="{Binding stopName}"
                                            FontSize="25"
                                            FontAttributes="Bold"
-                                           SemanticProperties.Description="{Binding stopName}" />
-                                    <Label Text=" " FontSize="2"/>
-                                </VerticalStackLayout>
+                                           SemanticProperties.Description="{Binding stopName}"/>
+                                    </VerticalStackLayout>
                             </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
