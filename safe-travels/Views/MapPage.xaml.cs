@@ -412,7 +412,11 @@ public partial class MapPage : ContentPage
         // In accessibility mode, we can show the search bar or a prompt
         if (AccessibilityView.IsVisible)
         {
-            DisplayAlert("Search Mode", "Enter a stop name in the search field.", "OK");
+            AccessibleSearchSection.IsVisible = !AccessibleSearchSection.IsVisible;
+            AccessibleSearchResults.IsVisible = false;
+
+            if (AccessibleSearchSection.IsVisible)
+                DisplayAlert("Search Mode", "Enter a stop name below to find bus stops.", "OK");
         }
     }
 
@@ -471,6 +475,44 @@ public partial class MapPage : ContentPage
             await Navigation.PushAsync(new BusDetailPage(busDetails, selectedStop.stopName, selectedStop.stopId));
         }
         AccessibleStopsList.SelectedItem = null;
+    }
+
+    private async void OnAccessibleSearchCompleted(object sender, EventArgs e)
+    {
+        var query = AccessibleSearchEntry.Text?.Trim();
+        if (string.IsNullOrEmpty(query)) return;
+
+        try
+        {
+            var stops = await AucklandTransportAPIClient.DemoStopToTripFlow(query);
+            if (stops == null || !stops.Any())
+            {
+                await DisplayAlert("No Results", $"No stops found matching '{query}'.", "OK");
+                AccessibleSearchResults.IsVisible = false;
+                return;
+            }
+
+            AccessibleSearchResults.ItemsSource = stops.ToList();
+            AccessibleSearchResults.IsVisible = true;
+
+            SemanticScreenReader.Announce($"{stops.Count()} stops found.");
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Search Error", ex.Message, "OK");
+        }
+    }
+
+    private async void OnAccessibleSearchResultSelected(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.CurrentSelection?.FirstOrDefault() is Stop selectedStop)
+        {
+            var stopTripCalls = new InboundTripsAPI();
+            var busDetails = await stopTripCalls.GetTripsByStopID(selectedStop.stopId);
+            await Navigation.PushAsync(new BusDetailPage(busDetails, selectedStop.stopName, selectedStop.stopId));
+        }
+
+        AccessibleSearchResults.SelectedItem = null;
     }
     #endregion
 }

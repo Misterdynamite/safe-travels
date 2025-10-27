@@ -35,21 +35,13 @@
 
             <VerticalStackLayout>
                 <Label Text="{Binding StopName}"
-                       SemanticProperties.Description="{Binding StopName}"
-                       SemanticProperties.Hint="Name of selected Buss Stop"
                        FontSize="24"
                        FontAttributes="Bold"/>
-                <Label Text="{Binding StopId, StringFormat='Stop ID: {0}'}"
-                       SemanticProperties.Description="Stop ID {Binding StopId,  StringFormat='Stop ID: {0}'}"
-                       SemanticProperties.Hint="Identifier for this Stop"
-                       FontSize="14"
-                       TextColor="{DynamicResource PrimaryTextColor}"/>
             </VerticalStackLayout>
         </Border>
 
         <Label Text="Upcoming Buses" FontSize="18" FontAttributes="Bold"
-               SemanticProperties.Description="Upcoming Busses"
-               SemanticProperties.Hint="Below is a list of arriving busses"
+               SemanticProperties.Description="Upcoming Buses"
             />
         
         <!-- Loading Indicator -->
@@ -59,9 +51,7 @@
                           Color="{DynamicResource Primary}"
                           HorizontalOptions="Center"
                           VerticalOptions="Center"
-                          Margin="20"
-                          SemanticProperties.Description="Loading buses"
-                          SemanticProperties.Hint="Please wait while buses are being loaded"/>
+                          Margin="20"/>
 
         <CollectionView x:Name="BusCollection"
                 ItemsSource="{Binding Trips}"
@@ -74,9 +64,7 @@
                             <!-- Destination -->
                             <Label Grid.Row="0" Grid.Column="0" 
                                    Text="{Binding attributes.stopHeadSign}" 
-                                   FontSize="16" FontAttributes="Bold"
-                                   SemanticProperties.Description="{Binding attributes.stopHeadSign}"
-                                   SemanticProperties.Hint="Bus Destination"/>
+                                   FontSize="16" FontAttributes="Bold"/>
                             
                             <!-- Countdown Badge (shows on right side when available) -->
                             <Border Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
@@ -99,27 +87,21 @@
                                        FontAttributes="Bold" 
                                        TextColor="White"
                                        HorizontalTextAlignment="Center"
-                                       VerticalTextAlignment="Center"
-                                       SemanticProperties.Description="{Binding attributes.ArrivalCountdown}"
-                                       SemanticProperties.Hint="Minutes until arrival"/>
+                                       VerticalTextAlignment="Center"/>
                             </Border>
                             
-                            <!-- Route Number -->
+                            <!-- Route Number --><!--
                             <Label Grid.Row="1" Grid.Column="0" 
                                    Text="{Binding attributes.routeId, StringFormat='Route {0}'}" 
                                    FontSize="14"
-                                   TextColor="{DynamicResource SecondaryTextColor}"
-                                   SemanticProperties.Description="{Binding attributes.routeId}"
-                                   SemanticProperties.Hint="Bus Route Number"/>
+                                   TextColor="{DynamicResource SecondaryTextColor}"/>-->
                             
                             <!-- Arrival Time -->
                             <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
                                    Text="{Binding attributes.arrivalTime, StringFormat='Arrives: {0}'}" 
                                    FontSize="13" 
                                    TextColor="{DynamicResource PrimaryTextColor}"
-                                   Margin="0,4,0,0"
-                                   SemanticProperties.Description="{Binding attributes.arrivalTime}"
-                                   SemanticProperties.Hint="Arrival Time"/>
+                                   Margin="0,4,0,0"/>
                         </Grid>
                     </Border>
                 </DataTemplate>
