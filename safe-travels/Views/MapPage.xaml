@@ -120,7 +120,6 @@
                                            FontSize="20"
                                            FontAttributes="Bold"
                                            SemanticProperties.Description="{Binding DisplayLabel}" />
-                                    <Label Text="{Binding stopId}" FontSize="14" />
                                 </VerticalStackLayout>
                             </Border>
                         </DataTemplate>
@@ -145,7 +144,6 @@
                                            FontSize="20"
                                            FontAttributes="Bold"
                                            SemanticProperties.Description="{Binding stopName}" />
-                                    <Label Text="{Binding stopId}" FontSize="14" />
                                 </VerticalStackLayout>
                             </Border>
                         </DataTemplate>
