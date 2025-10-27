@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using safe_travels.Models;
 
 namespace safe_travels.API.AucklandTransportAPI
 {
@@ -146,41 +147,5 @@ namespace safe_travels.API.AucklandTransportAPI
             double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
             return R * c;
         }
-    }
-
-    /// <summary>
-    /// Represents a stop returned by the Auckland Transport API.
-    /// </summary>
-    public class Stop
-    {
-        /// <summary>
-        /// Gets or sets the type of the stop.
-        /// </summary>
-        public required string type { get; set; }
-
-        /// <summary>
-        /// Gets or sets the unique identifier of the stop.
-        /// </summary>
-        public required string id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the stop ID.
-        /// </summary>
-        public required string stopId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the name of the stop.
-        /// </summary>
-        public required string stopName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the latitude of the stop.
-        /// </summary>
-        public double stopLat { get; set; }
-
-        /// <summary>
-        /// Gets or sets the longitude of the stop.
-        /// </summary>
-        public double stopLong { get; set; }
     }
 }

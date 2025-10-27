@@ -1,5 +1,6 @@
 using Microsoft.Maui.Controls;
 using safe_travels.API.AucklandTransportAPI;
+using safe_travels.Models;
 using safe_travels.Utilities;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
@@ -93,6 +94,10 @@ public partial class TrainDetailPage : ContentPage
     }
 
 }
+
+
+
+
 
 
 

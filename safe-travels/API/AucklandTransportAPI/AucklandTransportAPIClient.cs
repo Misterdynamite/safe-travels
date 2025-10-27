@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using safe_travels.API.AucklandTransportAPI.Legacy;
+using safe_travels.Models;
 
 namespace safe_travels.API.AucklandTransportAPI
 {
@@ -430,46 +431,11 @@ namespace safe_travels.API.AucklandTransportAPI
         /// <summary>
         /// Converts legacy service alerts to the new ServiceAlert format.
         /// </summary>
-        private static List<ServiceAlert> ConvertLegacyAlerts(List<LegacyServiceAlertsAPI.ServiceAlert> legacyAlerts)
+        private static List<ServiceAlert> ConvertLegacyAlerts(List<ServiceAlert> legacyAlerts)
         {
-            var alerts = new List<ServiceAlert>();
-            
-            foreach (var legacy in legacyAlerts)
-            {
-                var alert = new ServiceAlert
-                {
-                    Id = legacy.Id,
-                    Header = legacy.Header,
-                    Description = legacy.Description,
-                    ActivePeriods = new List<AlertPeriod>(),
-                    Entities = new List<AlertEntity>()
-                };
-
-                // Convert active periods
-                foreach (var period in legacy.ActivePeriods)
-                {
-                    alert.ActivePeriods.Add(new AlertPeriod
-                    {
-                        Start = period.Start,
-                        End = period.End
-                    });
-                }
-
-                // Convert entities
-                foreach (var entity in legacy.Entities)
-                {
-                    alert.Entities.Add(new AlertEntity
-                    {
-                        AgencyId = entity.AgencyId,
-                        RouteId = entity.RouteId,
-                        StopId = entity.StopId
-                    });
-                }
-
-                alerts.Add(alert);
-            }
-
-            return alerts;
+            // The legacy alerts are already in the correct format since we updated LegacyServiceAlertsAPI
+            // to return the unified ServiceAlert format
+            return legacyAlerts;
         }
 
         /// <summary>

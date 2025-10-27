@@ -1,4 +1,5 @@
 using safe_travels.API.AucklandTransportAPI;
+using safe_travels.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

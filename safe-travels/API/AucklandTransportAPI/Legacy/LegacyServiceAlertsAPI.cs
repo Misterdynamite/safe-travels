@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+using System.Text.Json;
+using safe_travels.Models;
 
 namespace safe_travels.API.AucklandTransportAPI.Legacy
 {
@@ -109,27 +110,6 @@ namespace safe_travels.API.AucklandTransportAPI.Legacy
                 Console.WriteLine($"Error fetching service alerts: {ex.Message}");
                 return new List<ServiceAlert>();
             }
-        }
-        public class ServiceAlert
-        {
-            public string Id { get; set; }
-            public string Header { get; set; }
-            public string Description { get; set; }
-            public List<AlertPeriod> ActivePeriods { get; set; }
-            public List<AlertEntity> Entities { get; set; }
-        }
-
-        public class AlertPeriod
-        {
-            public long Start { get; set; }
-            public long End { get; set; }
-        }
-
-        public class AlertEntity
-        {
-            public string AgencyId { get; set; }
-            public string RouteId { get; set; }
-            public string StopId { get; set; }
         }
     }
 }

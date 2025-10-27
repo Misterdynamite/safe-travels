@@ -1,12 +1,12 @@
 using safe_travels.API.LocationIQ;
 using safe_travels.API.AucklandTransportAPI;
+using safe_travels.Models;
 using Microsoft.Maui.Controls;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Diagnostics;
-using safe_travels.API.AucklandTransportAPI;
 
 namespace safe_travels.Views;
 

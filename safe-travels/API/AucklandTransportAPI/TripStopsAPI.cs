@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using safe_travels.Models;
 
 namespace safe_travels.API.AucklandTransportAPI
 {
