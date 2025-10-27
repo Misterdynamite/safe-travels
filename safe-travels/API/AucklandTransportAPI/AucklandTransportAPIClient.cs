@@ -5,11 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using safe_travels.API.AucklandTransportAPI.Legacy;
+using safe_travels.Models;
 
 namespace safe_travels.API.AucklandTransportAPI
 {
     /// <summary>
-    /// Provides static methods to interact with Auckland Transport APIs for stops and trips,
+    /// Provides static methods to interact with Auckland Transport APIs for stops, trips, and service alerts,
     /// including fallback to legacy APIs if the primary API fails.
     /// </summary>  
     internal static class AucklandTransportAPIClient
@@ -20,6 +21,8 @@ namespace safe_travels.API.AucklandTransportAPI
         private static readonly LegacyInboundTripsAPI _legacyStopTripsCaller = new LegacyInboundTripsAPI();
         private static readonly TripsAPI _tripCaller = new TripsAPI();
         private static readonly LegacyTripsAPI _legacyTripCaller = new LegacyTripsAPI();
+        private static readonly ServiceAlertsAPI _serviceAlertsCaller = new ServiceAlertsAPI();
+        private static readonly LegacyServiceAlertsAPI _legacyServiceAlertsCaller = new LegacyServiceAlertsAPI();
 
         /// <summary>
         /// Fetches a list of stops near the user's location using the new API, 
@@ -31,15 +34,14 @@ namespace safe_travels.API.AucklandTransportAPI
         /// A list of <see cref="Stop"/> objects within 1000 meters of the specified location.
         /// Returns an empty list if no stops are found or both APIs fail.
         /// </returns>
-        public static async Task<List<Stop>> FetchStopsNearUser(double lat, double longi)
+        public static async Task<List<Stop>> FetchStopsNearUser(double lat, double longi, int meters = 1000)
         {
             List<Stop> stops = new List<Stop>();
 
             try
             {
                 Debug.WriteLine("Attempting to fetch stops using new API...");
-                stops = await _stopsCaller.GetStopsByProximity(lat, longi, 1000);
-                
+                stops = await _stopsCaller.GetStopsByProximity(lat, longi, meters);
                 if (stops != null && stops.Count > 0)
                 {
                     Debug.WriteLine($"Successfully fetched {stops.Count} stops using new API");
@@ -55,7 +57,7 @@ namespace safe_travels.API.AucklandTransportAPI
                 
                 try
                 {
-                    stops = await _legacyStopsCaller.GetStopsByProximity(lat, longi, 1000);
+                    stops = await _legacyStopsCaller.GetStopsByProximity(lat, longi, meters);
                     if (stops != null && stops.Count > 0)
                     {
                         Debug.WriteLine($"Successfully fetched {stops.Count} stops using legacy API");
@@ -286,5 +288,169 @@ namespace safe_travels.API.AucklandTransportAPI
 
             return trips;
         }
+
+        /// <summary>
+        /// Fetches service alerts for a specific stop using the new API,
+        /// with fallback to the legacy API if necessary.
+        /// </summary>
+        /// <param name="stopId">The stop ID to get alerts for.</param>
+        /// <returns>
+        /// A list of <see cref="ServiceAlert"/> objects affecting the specified stop.
+        /// Returns an empty list if no alerts are found or both APIs fail.
+        /// </returns>
+        public static async Task<List<ServiceAlert>> GetServiceAlertsForStop(string stopId)
+        {
+            List<ServiceAlert> alerts = new List<ServiceAlert>();
+
+            try
+            {
+                Debug.WriteLine($"Attempting to fetch service alerts for stop {stopId} using new API...");
+                alerts = await _serviceAlertsCaller.GetAlertsByStopIdAsync(stopId);
+                
+                if (alerts != null && alerts.Count > 0)
+                {
+                    Debug.WriteLine($"Successfully fetched {alerts.Count} alerts using new API");
+                }
+                else
+                {
+                    throw new Exception("New API returned no results");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"New API failed: {ex.Message}. Falling back to legacy API...");
+                
+                try
+                {
+                    var legacyAlerts = await _legacyServiceAlertsCaller.GetServiceAlertsAsync(stopId);
+                    alerts = ConvertLegacyAlerts(legacyAlerts);
+                    
+                    if (alerts != null && alerts.Count > 0)
+                    {
+                        Debug.WriteLine($"Successfully fetched {alerts.Count} alerts using legacy API");
+                    }
+                    else
+                    {
+                        Debug.WriteLine("Legacy API also returned no results");
+                        alerts = new List<ServiceAlert>();
+                    }
+                }
+                catch (Exception legacyEx)
+                {
+                    Debug.WriteLine($"Legacy API also failed: {legacyEx.Message}");
+                    alerts = new List<ServiceAlert>();
+                }
+            }
+
+            if (alerts.Count == 0)
+            {
+                Debug.WriteLine($"No service alerts found for stop ID: {stopId}");
+            }
+            else
+            {
+                foreach (var alert in alerts)
+                {
+                    Debug.WriteLine($"Alert: {alert.Header}");
+                }
+            }
+
+            return alerts;
+        }
+
+        /// <summary>
+        /// Fetches service alerts for a specific route using the new API,
+        /// with fallback to the legacy API if necessary.
+        /// </summary>
+        /// <param name="routeId">The route ID to get alerts for.</param>
+        /// <returns>
+        /// A list of <see cref="ServiceAlert"/> objects affecting the specified route.
+        /// Returns an empty list if no alerts are found or both APIs fail.
+        /// </returns>
+        public static async Task<List<ServiceAlert>> GetServiceAlertsForRoute(string routeId)
+        {
+            List<ServiceAlert> alerts = new List<ServiceAlert>();
+
+            try
+            {
+                Debug.WriteLine($"Attempting to fetch service alerts for route {routeId} using new API...");
+                alerts = await _serviceAlertsCaller.GetAlertsByRouteIdAsync(routeId);
+                
+                if (alerts != null && alerts.Count > 0)
+                {
+                    Debug.WriteLine($"Successfully fetched {alerts.Count} alerts using new API");
+                }
+                else
+                {
+                    throw new Exception("New API returned no results");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"New API failed: {ex.Message}. Falling back to legacy API...");
+                
+                try
+                {
+                    var legacyAlerts = await _legacyServiceAlertsCaller.GetServiceAlertsAsync("");
+                    alerts = ConvertLegacyAlerts(legacyAlerts);
+                    
+                    // Filter by route ID
+                    alerts = alerts.Where(a => a.Entities.Any(e => e.RouteId == routeId)).ToList();
+                    
+                    if (alerts != null && alerts.Count > 0)
+                    {
+                        Debug.WriteLine($"Successfully fetched {alerts.Count} alerts using legacy API");
+                    }
+                    else
+                    {
+                        Debug.WriteLine("Legacy API also returned no results");
+                        alerts = new List<ServiceAlert>();
+                    }
+                }
+                catch (Exception legacyEx)
+                {
+                    Debug.WriteLine($"Legacy API also failed: {legacyEx.Message}");
+                    alerts = new List<ServiceAlert>();
+                }
+            }
+
+            if (alerts.Count == 0)
+            {
+                Debug.WriteLine($"No service alerts found for route ID: {routeId}");
+            }
+            else
+            {
+                foreach (var alert in alerts)
+                {
+                    Debug.WriteLine($"Alert: {alert.Header}");
+                }
+            }
+
+            return alerts;
+        }
+
+        /// <summary>
+        /// Converts legacy service alerts to the new ServiceAlert format.
+        /// </summary>
+        private static List<ServiceAlert> ConvertLegacyAlerts(List<ServiceAlert> legacyAlerts)
+        {
+            // The legacy alerts are already in the correct format since we updated LegacyServiceAlertsAPI
+            // to return the unified ServiceAlert format
+            return legacyAlerts;
+        }
+
+        /// <summary>
+        /// Checks if a service (trip) is currently running based on service alerts and schedule.
+        /// This method uses the alerts fetched from the API (with fallback) to determine service status.
+        /// </summary>
+        /// <param name="trip">The trip stop attributes to check.</param>
+        /// <param name="alerts">The list of service alerts (from GetServiceAlertsForStop or GetServiceAlertsForRoute).</param>
+        /// <param name="now">The current date/time.</param>
+        /// <param name="agencyId">The agency ID (optional).</param>
+        /// <returns>True if the service is running, false otherwise.</returns>
+        public static bool IsServiceRunning(TripStopAttributes trip, List<ServiceAlert> alerts, DateTime now, string agencyId = "")
+        {
+            return _serviceAlertsCaller.IsServiceRunning(trip, alerts, now, agencyId);
+        }
     }
+
 }

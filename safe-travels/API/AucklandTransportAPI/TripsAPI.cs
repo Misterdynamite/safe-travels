@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using safe_travels.Models;
 
 namespace safe_travels.API.AucklandTransportAPI
 {
@@ -97,25 +98,5 @@ namespace safe_travels.API.AucklandTransportAPI
             }
         }
 
-    }
-
-  
-    public class TripData
-    {
-        public string type { get; set; } = string.Empty;
-        public string id { get; set; } = string.Empty;
-        public TripAttributes attributes { get; set; } = new TripAttributes();
-    }
-
-    public class TripAttributes
-    {
-        public string tripId { get; set; } = string.Empty;
-        public string tripHeadsign { get; set; } = string.Empty;
-        public string tripStartTime { get; set; } = string.Empty;
-        public string routeId { get; set; } = string.Empty;
-        public string serviceDate { get; set; } = string.Empty;
-        public string stopHeadsign { get; set; } = string.Empty;
-        public int directionId { get; set; }
-        public string shapeId { get; set; } = string.Empty;
     }
 }

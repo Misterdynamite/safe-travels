@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="safe_travels.Views.TripStopsPage"
+             Title="Trip Route">
+
+    <VerticalStackLayout Padding="20" Spacing="8">
+        <SearchBar x:Name="StopSearchBar"
+                   SemanticProperties.Description="Stop Search Bar"
+                   SemanticProperties.Hint="Enter keywords to search for stops on this route"
+                   Placeholder="Search stops..."
+                   TextChanged="OnSearchTextChanged"
+                   HorizontalOptions="CenterAndExpand" />
+        
+        <Border Background="{DynamicResource CardBackgroundColor}" StrokeShape="RoundRectangle 12" Padding="23">
+            <VerticalStackLayout>
+                <Label Text="{Binding TripHeadsign}"
+                       SemanticProperties.Description="{Binding TripHeadsign}"
+                       SemanticProperties.Hint="Destination of this trip"
+                       FontSize="24"
+                       FontAttributes="Bold"/>
+                <Label Text="{Binding RouteId, StringFormat='Route {0}'}"
+                       SemanticProperties.Description="Route {Binding RouteId}"
+                       SemanticProperties.Hint="Route number"
+                       FontSize="14"
+                       TextColor="{DynamicResource PrimaryTextColor}"/>
+                <Label Text="{Binding TripId, StringFormat='Trip ID: {0}'}"
+                       SemanticProperties.Description="Trip ID {Binding TripId}"
+                       SemanticProperties.Hint="Identifier for this trip"
+                       FontSize="12"
+                       TextColor="{DynamicResource SecondaryTextColor}"/>
+            </VerticalStackLayout>
+        </Border>
+
+        <Label Text="All Stops on This Route" FontSize="18" FontAttributes="Bold"
+               SemanticProperties.Description="All Stops on This Route"
+               SemanticProperties.Hint="Below is a list of all stops on this route"
+            />
+        
+        <!-- Loading Indicator -->
+        <ActivityIndicator x:Name="LoadingIndicator"
+                          IsRunning="True"
+                          IsVisible="True"
+                          Color="{DynamicResource Primary}"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center"
+                          Margin="20"
+                          SemanticProperties.Description="Loading stops"
+                          SemanticProperties.Hint="Please wait while stops are being loaded"/>
+        
+        <CollectionView x:Name="StopsCollection"
+                ItemsSource="{Binding Stops}"
+                SelectionMode="Single"
+                SelectionChanged="OnStopSelected">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Background="{DynamicResource CardBackgroundColor}" StrokeShape="RoundRectangle 8" Margin="0,4" Padding="12">
+                        <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="12">
+                            <!-- Stop Sequence Number -->
+                            <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="2"
+                                    BackgroundColor="{DynamicResource Primary}" 
+                                    StrokeShape="RoundRectangle 20" 
+                                    WidthRequest="40"
+                                    HeightRequest="40"
+                                    VerticalOptions="Center">
+                                <Label Text="{Binding attributes.stopSequence}" 
+                                       FontSize="16" 
+                                       FontAttributes="Bold" 
+                                       TextColor="White"
+                                       HorizontalTextAlignment="Center"
+                                       VerticalTextAlignment="Center"
+                                       SemanticProperties.Description="Stop number {Binding attributes.stopSequence}"
+                                       SemanticProperties.Hint="Sequence number of this stop"/>
+                            </Border>
+                            
+                            <!-- Stop Name -->
+                            <Label Grid.Row="0" Grid.Column="1" 
+                                   Text="{Binding attributes.stopHeadSign}" 
+                                   FontSize="16" FontAttributes="Bold"
+                                   SemanticProperties.Description="{Binding attributes.stopHeadSign}"
+                                   SemanticProperties.Hint="Stop name"/>
+                            
+                            <!-- Countdown Badge (shows on right side when available) -->
+                            <Border Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
+                                    BackgroundColor="#00C853" 
+                                    StrokeShape="RoundRectangle 8" 
+                                    Padding="10,6"
+                                    VerticalOptions="Center"
+                                    Margin="8,0,0,0">
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding attributes.HopOffCountdown}" Value="">
+                                        <Setter Property="IsVisible" Value="False"/>
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Border" Binding="{Binding attributes.MinutesUntilArrival}" Value="0">
+                                        <Setter Property="BackgroundColor" Value="#D32F2F"/>
+                                    </DataTrigger>
+                                </Border.Triggers>
+                                <Label Text="{Binding attributes.HopOffCountdown}" 
+                                       FontSize="18" 
+                                       FontAttributes="Bold" 
+                                       TextColor="White"
+                                       HorizontalTextAlignment="Center"
+                                       VerticalTextAlignment="Center"
+                                       SemanticProperties.Description="{Binding attributes.HopOffCountdown}"
+                                       SemanticProperties.Hint="Minutes until you need to hop off"/>
+                            </Border>
+                            
+                            <!-- Stop ID -->
+                            <Label Grid.Row="1" Grid.Column="1" 
+                                   Text="{Binding attributes.stopId, StringFormat='Stop ID: {0}'}" 
+                                   FontSize="12"
+                                   TextColor="{DynamicResource SecondaryTextColor}"
+                                   SemanticProperties.Description="Stop ID {Binding attributes.stopId}"
+                                   SemanticProperties.Hint="Stop identifier"/>
+                            
+                            <!-- Arrival Time -->
+                            <Label Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
+                                   Text="{Binding attributes.arrivalTime, StringFormat='Arrives: {0}'}" 
+                                   FontSize="13" 
+                                   TextColor="{DynamicResource PrimaryTextColor}"
+                                   Margin="0,4,0,0"
+                                   SemanticProperties.Description="{Binding attributes.arrivalTime}"
+                                   SemanticProperties.Hint="Arrival Time"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </VerticalStackLayout>
+</ContentPage>

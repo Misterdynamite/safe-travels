@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using safe_travels.Models;
 
 namespace safe_travels.API.AucklandTransportAPI
 {
@@ -48,10 +49,10 @@ namespace safe_travels.API.AucklandTransportAPI
             for ( int i = 0; i < trips.Count; i++)
             {
                 TripData trip = trips[i];
-                Debug.WriteLine($"{i + 1}. Trip ID: {trip.id}, Route ID: {trip.attributes.routeId}, Start Time: {trip.attributes.tripStartTime}, Buss HeadSign: {trip.attributes.stopHeadsign} ");
+                Debug.WriteLine($"{i + 1}. Trip ID: {trip.id}, Route ID: {trip.attributes.routeId}, Start Time: {trip.attributes.tripStartTime}, Bus HeadSign: {trip.attributes.stopHeadsign} ");
             }
             TripData selectedTrip = trips[0];
-            Debug.WriteLine($"Selected Trip ID: {selectedTrip.id}, Route ID: {selectedTrip.attributes.routeId}, Start Time: {selectedTrip.attributes.tripStartTime}, Buss HeadSign: {selectedTrip.attributes.stopHeadsign} ");
+            Debug.WriteLine($"Selected Trip ID: {selectedTrip.id}, Route ID: {selectedTrip.attributes.routeId}, Start Time: {selectedTrip.attributes.tripStartTime}, Bus HeadSign: {selectedTrip.attributes.stopHeadsign} ");
 
         }
     }

@@ -3,9 +3,48 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="safe_travels.Views.SettingsPage"
              Title="Settings">
-    <VerticalStackLayout Padding="20" Spacing="-36">
-        <Label Text="Change Theme" FontSize="Large"/>
-        <Switch x:Name="ThemeSwitch"
-            Toggled="OnThemeToggled"/>
+
+    <VerticalStackLayout Padding="20" Spacing="30">
+
+        <!-- 🔹 Theme Toggle Row -->
+        <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+            <Label Text="Change Theme"
+                   FontSize="Large"
+                   VerticalOptions="Center"
+                   Grid.Column="0"
+                   SemanticProperties.Description="Change Theme between light and dark modes"
+                   SemanticProperties.Hint="Toggle to switch between light and dark themes" />
+            <Switch x:Name="ThemeSwitch"
+                    Grid.Column="1"
+                    Margin="20,0,0,0"
+                    Toggled="OnThemeToggled"
+                    VerticalOptions="Center"
+                    SemanticProperties.Description="App theme toggle"
+                    SemanticProperties.Hint="Double tap to change theme" />
+        </Grid>
+
+        <!-- 🔹 Accessibility Mode Row -->
+        <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+            <Label Text="Accessibility Mode"
+                   FontSize="Large"
+                   VerticalOptions="Center"
+                   Grid.Column="0"
+                   SemanticProperties.Description="Accessibility or blind mode"
+                   SemanticProperties.Hint="Enables screen reader-friendly mode and hides maps" />
+            <Switch x:Name="AccessibilitySwitch"
+                    Grid.Column="1"
+                    Margin="20,0,0,0"
+                    Toggled="OnAccessibilityToggled"
+                    VerticalOptions="Center"
+                    SemanticProperties.Description="Accessibility mode toggle"
+                    SemanticProperties.Hint="Double tap to turn accessibility mode on or off" />
+        </Grid>
+
+        <!-- Optional on/off text label (mirrors switch state) -->
+        <Label x:Name="AccessibilityStatusLabel"
+       FontSize="Medium"
+       TextColor="Gray"
+       SemanticProperties.Description="Accessibility mode status"
+       AutomationProperties.IsInAccessibleTree="True" />
     </VerticalStackLayout>
 </ContentPage>                              

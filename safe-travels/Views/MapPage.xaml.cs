@@ -1,8 +1,13 @@
+using Android.Content;
+using Java.Nio.FileNio;
 using Microsoft.Maui.Controls.Maps;
 using Microsoft.Maui.Devices.Sensors;
 using Microsoft.Maui.Maps;
 using safe_travels.API.AucklandTransportAPI;
 using safe_travels.Utilities;
+using safe_travels.Models;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 
 namespace safe_travels.Views;
 
@@ -14,7 +19,13 @@ public partial class MapPage : ContentPage
     /// <summary>
     /// Stores the user's favorite bus stops.
     /// </summary>
-    private List<Stop> _favoriteStops = new();
+    private List<FavoriteStop> _favoriteStops = new();
+
+    // Accessibility list and batching state
+    private List<Stop> _accessibleStops = new();
+    private int _currentStopBatch = 0;
+    private const int StopsPerBatch = 10;
+    private bool _isStopsListVisible = false;
 
     /// <summary>
     /// Mode for showing stops near the user's location.
@@ -44,8 +55,11 @@ public partial class MapPage : ContentPage
     /// </summary>
     protected override void OnAppearing()
     {
-        base.OnAppearing();
-        LoadFavoriteStops();
+        bool isAccessibilityMode = Preferences.Get("AccessibilityMode", false);
+
+        NormalView.IsVisible = !isAccessibilityMode;
+        AccessibilityView.IsVisible = isAccessibilityMode;
+
     }
 
     #region Favorite Stops
@@ -57,36 +71,72 @@ public partial class MapPage : ContentPage
     {
         _favoriteStops = FavoriteBusManager.LoadFavoriteStops();
         FavoriteStopsCollection.ItemsSource = _favoriteStops;
+
+        // If an accessibility favorites list exists in XAML, populate it too so the AccessibilityView shows the same favorites
+        var accessibleFavorites = FindByName("AccessibleFavoriteStops") as CollectionView;
+        if (accessibleFavorites != null)
+        {
+            accessibleFavorites.ItemsSource = _favoriteStops;
+        }
     }
 
     /// <summary>
-    /// Handles selection of a favorite stop, navigates to its detail page.
+    /// Handles selection of a favorite stop, opens its detail page.
     /// </summary>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">Selection changed event arguments.</param>
-    private void OnFavoriteStopSelected(object sender, SelectionChangedEventArgs e)
+    private async void OnFavoriteStopSelected(object sender, SelectionChangedEventArgs e)
     {
-        if (e.CurrentSelection?.FirstOrDefault() is Stop selectedStop)
+        if (e.CurrentSelection?.FirstOrDefault() is FavoriteStop fav)
         {
-            var stopTripCalls = new InboundTripsAPI();
-            Dispatcher.Dispatch(async () =>
+            // Clear selections from both collections immediately to prevent stuck state
+            var senderCollection = sender as CollectionView;
+            if (senderCollection != null)
             {
-                var busDetails = await stopTripCalls.GetTripsByStopID(selectedStop.stopId);
-                if (Application.Current?.MainPage is NavigationPage navigationPage)
+                senderCollection.SelectedItem = null;
+            }
+            
+            // Also clear the other favorites collection if it exists
+            if (senderCollection == FavoriteStopsCollection)
+            {
+                var accessibleFavorites = FindByName("AccessibleFavoriteStops") as CollectionView;
+                if (accessibleFavorites != null)
                 {
-                    await navigationPage.Navigation.PushAsync(new BusDetailPage(busDetails, selectedStop.stopName, selectedStop.stopId));
+                    accessibleFavorites.SelectedItem = null;
                 }
-                else if (Navigation != null)
-                {
-                    await Navigation.PushAsync(new BusDetailPage(busDetails, selectedStop.stopName, selectedStop.stopId));
-                }
-                else
-                {
-                    await DisplayAlert("Navigation Error", "Navigation is not available. Please ensure this page is within a NavigationPage.", "OK");
-                }
-            });
+            }
+            else if (string.Equals(senderCollection?.StyleId, "AccessibleFavoriteStops", StringComparison.Ordinal))
+            {
+                FavoriteStopsCollection.SelectedItem = null;
+            }
+
+            var stopTripCalls = new InboundTripsAPI();
+            var busDetails = await stopTripCalls.GetTripsByStopID(fav.stopId);
+
+            if (Application.Current?.MainPage is NavigationPage navigationPage)
+            {
+                await navigationPage.Navigation.PushAsync(new BusDetailPage(busDetails, fav.stopName, fav.stopId));
+            }
+            else if (Navigation != null)
+            {
+                await Navigation.PushAsync(new BusDetailPage(busDetails, fav.stopName, fav.stopId));
+            }
+            else
+            {
+                await DisplayAlert("Navigation Error", "Navigation is not available. Please ensure this page is within a NavigationPage.", "OK");
+            }
         }
-        FavoriteStopsCollection.SelectedItem = null;
+    }
+
+    /// <summary>
+    /// Remove favorite when user taps the inline Remove button in the favorite item.
+    /// </summary>
+    private async void OnRemoveFavoriteClicked(object sender, EventArgs e)
+    {
+        if (sender is Button btn && btn.BindingContext is FavoriteStop fav)
+        {
+            FavoriteBusManager.RemoveFavoriteStop(fav.stopId);
+            LoadFavoriteStops();
+            await DisplayAlert("Removed", $"Removed favorite '{fav.DisplayLabel}'", "OK");
+        }
     }
     #endregion
 
@@ -141,6 +191,7 @@ public partial class MapPage : ContentPage
 
             var stops = await AucklandTransportAPIClient.FetchStopsNearUser(latitude, longitude);
             AddStopsToMap(stops);
+            ShowStopsInAccessibilityView(stops);
         }
         catch (Exception ex)
         {
@@ -158,7 +209,8 @@ public partial class MapPage : ContentPage
         try
         {
             var stops = await AucklandTransportAPIClient.DemoStopToTripFlow(stopName);
-            AddStopsToMap(stops);
+            await AddStopsToMap(stops);
+            ShowStopsInAccessibilityView(stops);
         }
         catch (Exception ex)
         {
@@ -170,7 +222,7 @@ public partial class MapPage : ContentPage
     /// Adds a collection of stops as pins to the map and centers the map view.
     /// </summary>
     /// <param name="stops">The stops to add to the map.</param>
-    private void AddStopsToMap(IEnumerable<Stop> stops)
+    private async Task AddStopsToMap(IEnumerable<Stop> stops)
     {
         if (stops == null || !stops.Any()) return;
 
@@ -193,20 +245,32 @@ public partial class MapPage : ContentPage
                 {
                     var stopTripCalls = new InboundTripsAPI();
                     var busDetails = await stopTripCalls.GetTripsByStopID(clickedStop.stopId);
-                    if (Application.Current?.MainPage is NavigationPage navigationPage)
+
+                    //pammis bit
+                    if (IsTrainStop(clickedStop.stopName))
                     {
-                        await navigationPage.Navigation.PushAsync(new BusDetailPage(busDetails, clickedStop.stopName, clickedStop.stopId));
-                    }
-                    else if (Navigation != null)
+                       var flatTrips = busDetails.SelectMany(bd => bd.data).ToList();
+                        await Navigation.PushAsync(new TrainDetailPage(flatTrips, clickedStop.stopId, clickedStop.stopName));
+                    } else
                     {
-                        await Navigation.PushAsync(new BusDetailPage(busDetails, clickedStop.stopName, clickedStop.stopId));
+                        if (Application.Current?.MainPage is NavigationPage navigationPage)
+                        {
+                            await navigationPage.Navigation.PushAsync(new BusDetailPage(busDetails, clickedStop.stopName, clickedStop.stopId));
+                        }
+                        else if (Navigation != null)
+                        {
+                            await Navigation.PushAsync(new BusDetailPage(busDetails, clickedStop.stopName, clickedStop.stopId));
+                        }
+                        else
+                        {
+                            await DisplayAlert("Navigation Error", "Navigation is not available. Please ensure this page is within a NavigationPage.", "OK");
+                        }
                     }
-                    else
-                    {
-                        await DisplayAlert("Navigation Error", "Navigation is not available. Please ensure this page is within a NavigationPage.", "OK");
-                    }
+                    //
+                    
                 }
             };
+            await Task.Yield(); // Yield to keep UI responsive during pin addition
         }
 
         // Center map between all stops
@@ -284,20 +348,129 @@ public partial class MapPage : ContentPage
     /// </summary>
     /// <param name="sender">The event sender.</param>
     /// <param name="e">Pin clicked event arguments.</param>
-    private void OnMarkerClicked(object sender, PinClickedEventArgs e)
+    
+    private bool IsTrainStop(string stopName)
     {
-        if (sender is Pin pin && pin.MarkerId is string stopId)
+        return stopName.Contains("Train Station", StringComparison.OrdinalIgnoreCase)
+            || stopName.Contains("Station", StringComparison.OrdinalIgnoreCase)
+            || stopName.Contains("Train", StringComparison.OrdinalIgnoreCase);
+    }
+    /// <summary>
+    /// Handles nearby stops click events.
+    /// </summary>
+    /// <param name="sender">The event sender.</param>
+    /// <param name="e">Pin clicked event arguments.</param>
+    private void OnNearbyStopsButtonClicked(object sender, EventArgs e)
+    {
+        if (_isStopsListVisible)
         {
-            Console.WriteLine($"StopID: {stopId}");
+            AccessibleStopsList.IsVisible = false;
+            ShowMoreButton.IsVisible = false;
+            _isStopsListVisible = false;
+            SemanticScreenReader.Announce("Nearby stops list hidden.");
+            return;
         }
+
+        _isStopsListVisible = true;
+        AccessibleStopsList.IsVisible = true;
+        StopModePicker.SelectedIndex = 0; // Nearby
+        StopSearchBar.IsVisible = false;
+        LoadStopsInProximity();
     }
 
+    private void OnShowMoreClicked(object sender, EventArgs e)
+    {
+        ShowNextBatchOfStops();
+    }
+
+    private async Task OnMarkerClicked(object sender, PinClickedEventArgs e)
+    {
+        if ( sender is not Pin pin || pin.MarkerId is not string stopId)
+            return;
+
+        var context = BindingContext as dynamic;
+        if (context?.Trips is not List<TripStopData> trips)
+            return;
+
+        string stopName = pin.Label ?? "";
+        Console.WriteLine($"StopID: {stopId}");
+
+       await Navigation.PushAsync(new BusDetailPage(trips, stopName, stopId));
+        
+    }
+
+    /// <summary>
+    /// Handles search button click events.
+    /// </summary>
+    /// <param name="sender">The event sender.</param>
+    /// <param name="e">Pin clicked event arguments.</param>
+    private void OnSearchStopsButtonClicked(object sender, EventArgs e)
+    {
+        StopModePicker.SelectedIndex = 1; // Search mode
+        StopSearchBar.IsVisible = true;
+
+        // In accessibility mode, we can show the search bar or a prompt
+        if (AccessibilityView.IsVisible)
+        {
+            DisplayAlert("Search Mode", "Enter a stop name in the search field.", "OK");
+        }
+    }
 
     private async void OnSettingsClicked(object sender, EventArgs e)
     {
         await Navigation.PushAsync(new SettingsPage());
     }
 
+    private async void OnJourneyPlannerClicked(object sender, EventArgs e)
+    {
+        await Navigation.PushAsync(new JourneyPlannerPage());
+    }
+
+
+
     #endregion
 
+    #region Accessibility Mode
+    private void ShowStopsInAccessibilityView(IEnumerable<Stop> stops)
+    {
+        if (AccessibilityView.IsVisible)
+        {
+            AccessibleStopsList.ItemsSource = stops.ToList();
+        }
+        _accessibleStops = stops.ToList();
+        _currentStopBatch = 0;
+
+        ShowNextBatchOfStops();
+    }
+
+    private void ShowNextBatchOfStops()
+    {
+        if (_accessibleStops == null || !_accessibleStops.Any())
+        {
+            AccessibleStopsList.ItemsSource = new List<Stop>();
+            return;
+        }
+
+        int start = _currentStopBatch * StopsPerBatch;
+        int end = Math.Min(start + StopsPerBatch, _accessibleStops.Count);
+
+        var visibleBatch = _accessibleStops.Take(end).ToList();
+        AccessibleStopsList.ItemsSource = visibleBatch;
+
+        _currentStopBatch++;
+
+        ShowMoreButton.IsVisible = _currentStopBatch * StopsPerBatch < _accessibleStops.Count;
+    }
+
+    private async void OnAccessibleStopSelected(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.CurrentSelection?.FirstOrDefault() is Stop selectedStop)
+        {
+            var stopTripCalls = new InboundTripsAPI();
+            var busDetails = await stopTripCalls.GetTripsByStopID(selectedStop.stopId);
+            await Navigation.PushAsync(new BusDetailPage(busDetails, selectedStop.stopName, selectedStop.stopId));
+        }
+        AccessibleStopsList.SelectedItem = null;
+    }
+    #endregion
 }

@@ -4,110 +4,215 @@
     xmlns:maps="clr-namespace:Microsoft.Maui.Controls.Maps;assembly=Microsoft.Maui.Controls.Maps"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     x:Class="safe_travels.Views.JourneyPlannerPage"
-    Title="Journey Planner">
-    <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="White">
-        <maps:Map />
-        <!-- 🔹 Top App Bar -->
-        <Grid BackgroundColor="#F8F8F8" Padding="10" Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+    Title="Journey Planner"
+    BackgroundColor="{DynamicResource CardBackgroundColor}">
 
-            <!-- Hamburger Menu -->
-            <ImageButton Source="menu.png"
-                         WidthRequest="24" HeightRequest="24"
-                         BackgroundColor="Transparent"
-                         Grid.Column="0"/>
-
-            <!-- Title -->
-            <Label Text="Label"
-                   FontSize="20"
-                   HorizontalOptions="Center"
-                   VerticalOptions="Center"
-                   Grid.Column="1"/>
-
-            <!-- Profile -->
-            <ImageButton Source="profile.png"
-                         WidthRequest="32" HeightRequest="32"
-                         CornerRadius="16"
-                         BackgroundColor="LightGray"
-                         Grid.Column="2"/>
-        </Grid>
-
-        <!-- 🔹 Main Content -->
-        <ScrollView Grid.Row="1" Padding="15">
-            <VerticalStackLayout Spacing="15">
-
-                <!-- Search Bar -->
-                <SearchBar Placeholder="Enter stop number or location..."
-                           BackgroundColor="#EFEFEF"
-                           TextColor="Black"
-                           PlaceholderColor="Gray"/>
+    <Grid RowDefinitions="Auto,*,Auto" BackgroundColor= "{DynamicResource CardBackgroundColor}">
+        <Grid x:Name="NormalView"
+              RowDefinitions="Auto,*,Auto"
+              IsVisible="True"
+              BackgroundColor="{DynamicResource CardBackgroundColor}">
+            <!-- 🔹 Main Content -->
+            <VerticalStackLayout Grid.Row="1" Padding="15" Spacing="15" ZIndex="2">
 
                 <!-- Journey Section -->
                 <Label Text="YOUR JOURNEY" FontSize="18" FontAttributes="Bold"/>
                 <Label Text="Choose your journey" FontSize="14" TextColor="Gray"/>
 
-                <CollectionView>
+                <!-- Origin Input -->
+                <Entry x:Name="OriginInput"
+                   Placeholder="Enter origin address..."
+                   TextColor="{DynamicResource SecondaryTextColor}"
+                   TextChanged="OnOriginTextChanged"
+                   Margin="0,5"/>
+
+                <!-- Origin Suggestions -->
+                <CollectionView x:Name="OriginSuggestionsView"
+                            IsVisible="False"
+                            BackgroundColor="{DynamicResource CardBackgroundColor}"
+                            HeightRequest="200"
+                            ZIndex="10"
+                            SelectionMode="Single">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Border Stroke="#DDD" StrokeThickness="1" StrokeShape="RoundRectangle 12" Margin="0,5">
-                                <HorizontalStackLayout Padding="10" Spacing="10">
-                                    <Frame WidthRequest="30" HeightRequest="30" CornerRadius="15" BackgroundColor="#B49BEB" HasShadow="False" VerticalOptions="Center">
-                                        <Label Text="A" HorizontalOptions="Center" VerticalOptions="Center" TextColor="White"/>
-                                    </Frame>
-                                    <Label Text="{Binding .}" VerticalOptions="Center"/>
-                                </HorizontalStackLayout>
-                            </Border>
+                            <Label Text="{Binding display_name}"
+                               Padding="10"
+                               TextColor= "{DynamicResource SecondaryTextColor}"
+                               BackgroundColor="{DynamicResource CardBackgroundColor}">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnOriginSuggestionChosen"/>
+                                </Label.GestureRecognizers>
+                            </Label>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
-
-                    <!-- Example static data -->
-                    <CollectionView.ItemsSource>
-                        <x:Array Type="{x:Type x:String}">
-                            <x:String>Bus #1 to walking 30m to Bus #2 to point B</x:String>
-                            <x:String>Bus #1 to Bus #3 to walking 500m to point B</x:String>
-                            <x:String>Bus #1 to Bus #3 to point B</x:String>
-                        </x:Array>
-                    </CollectionView.ItemsSource>
                 </CollectionView>
 
-                <!-- Cancel / Select Buttons -->
-                <HorizontalStackLayout Spacing="20" HorizontalOptions="End">
-                    <Button Text="Cancel" BackgroundColor="Transparent" TextColor="Gray"/>
-                    <Button Text="Select" BackgroundColor="#B49BEB" TextColor="White" CornerRadius="20"/>
-                </HorizontalStackLayout>
+                <!-- Destination Input -->
+                <Entry x:Name="DestinationInput"
+                   Placeholder="Enter destination address..."
+                   TextColor="{DynamicResource SecondaryTextColor}"
+                   FontAttributes="Bold"
+                   TextChanged="OnDestinationTextChanged"
+                   Margin="0,5"/>
 
-                <!-- ETA Section -->
-                <Border Stroke="#DDD" StrokeThickness="1" StrokeShape="RoundRectangle 20" Padding="15" BackgroundColor="#F9F9F9">
-                    <VerticalStackLayout Spacing="10">
-                        <Label Text="YOUR BUS TO (LOCATION) ARRIVES IN: 6:07s" FontSize="14" TextColor="Black"/>
-                        <HorizontalStackLayout Spacing="15" HorizontalOptions="Center">
-                            <Button Text="HIDE" WidthRequest="100" BackgroundColor="#E0E0E0" TextColor="Black" CornerRadius="20"/>
-                            <Button Text="OPEN" WidthRequest="100" BackgroundColor="#B49BEB" TextColor="White" CornerRadius="20"/>
-                        </HorizontalStackLayout>
-                    </VerticalStackLayout>
-                </Border>
+                <!-- Destination Suggestions -->
+                <CollectionView x:Name="DestinationSuggestionsView"
+                            IsVisible="False"
+                            BackgroundColor="{DynamicResource CardBackgroundColor}"
+                            HeightRequest="200"
+                            ZIndex="10"
+                            SelectionMode="Single">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Label Text="{Binding display_name}"
+                               Padding="10"
+                               TextColor="Black"
+                               BackgroundColor="White">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnDestinationSuggestionChosen"/>
+                                </Label.GestureRecognizers>
+                            </Label>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
 
-            </VerticalStackLayout>
-        </ScrollView>
+                <!-- Journey Results -->
+                <CollectionView x:Name="JourneyResults"
+                            IsVisible="False">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Label Text="{Binding}" Padding="10" TextColor="Black"/>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
 
-        <!-- 🔹 Bottom Navigation -->
-        <Grid Grid.Row="2" BackgroundColor="White" Padding="10" ColumnDefinitions="*,*,*">
-            <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center">
-                <Image Source="planner.png" HeightRequest="24"/>
-                <Label Text="Journey Planner" FontSize="12" HorizontalOptions="Center"/>
-            </VerticalStackLayout>
-            <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center">
-                <Image Source="live.png" HeightRequest="24"/>
-                <Label Text="Live Tracking" FontSize="12" HorizontalOptions="Center"/>
-            </VerticalStackLayout>
-            <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center">
-                <Image Source="saved.png" HeightRequest="24"/>
-                <Label Text="Saved Journeys" FontSize="12" HorizontalOptions="Center"/>
+                <!-- Plan Journey Button -->
+                <Button Text="Plan Journey"
+                    
+                    TextColor="{DynamicResource SecondaryTextColor}"
+                    FontAttributes="Bold"
+                    Clicked="OnPlanJourneyClicked"
+                    Margin="0,10"/>
+
             </VerticalStackLayout>
         </Grid>
+        <ScrollView x:Name="AccessibilityView"
+                    IsVisible="False"
+                    Padding="25"
+                    BackgroundColor="{DynamicResource CardBackgroundColor}">
+            <VerticalStackLayout Spacing="20">
+
+                <Label Text="Accessibility Mode Active"
+                       FontSize="28"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center"
+                       SemanticProperties.Description="Accessibility mode is active" />
+
+                <Label Text="Plan your journey with larger text and screen reader support."
+                       FontSize="20"
+                       TextColor="{DynamicResource SecondaryTextColor}"
+                       HorizontalOptions="Center"
+                       SemanticProperties.Description="Instructions for accessibility users" />
+
+                <Label Text="Enter Origin Address:"
+                       FontSize="22"
+                       FontAttributes="Bold"
+                       SemanticProperties.Description="Enter the starting point of your journey" />
+                <Entry x:Name="AccessibleOriginInput"
+                       Placeholder="Enter origin address..."
+                       FontSize="22"
+                       TextColor="{DynamicResource PrimaryTextColor}"
+                       TextChanged="OnOriginTextChanged"
+                       HeightRequest="60"
+                       SemanticProperties.Description="Type the starting point for your trip" />
+
+                <CollectionView x:Name="AccessibleOriginSuggestionsView"
+                        IsVisible="False"
+                        BackgroundColor="{DynamicResource CardBackgroundColor}"
+                        HeightRequest="250"
+                        SelectionMode="Single"
+                        SemanticProperties.Description="List of suggested origin addresses">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame CornerRadius="12"
+                           Margin="6"
+                           Padding="10"
+                           BackgroundColor="{DynamicResource CardBackgroundColor}">
+                                <Label Text="{Binding display_name}"
+                               FontSize="22"
+                               TextColor="{DynamicResource PrimaryTextColor}">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnOriginSuggestionChosen"/>
+                                    </Label.GestureRecognizers>
+                                </Label>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <Label Text="Enter Destination Address:"
+                       FontSize="22"
+                       FontAttributes="Bold"
+                       SemanticProperties.Description="Enter the destination of your journey" />
+                <Entry x:Name="AccessibleDestinationInput"
+                       Placeholder="Enter destination address..."
+                       FontSize="22"
+                       TextColor="{DynamicResource PrimaryTextColor}"
+                       TextChanged="OnDestinationTextChanged"
+                       HeightRequest="60"
+                       SemanticProperties.Description="Type the destination for your trip" />
+                <CollectionView x:Name="AccessibleDestinationSuggestionsView"
+                        IsVisible="False"
+                        BackgroundColor="{DynamicResource CardBackgroundColor}"
+                        HeightRequest="250"
+                        SelectionMode="Single"
+                        SemanticProperties.Description="List of suggested destination addresses">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame CornerRadius="12"
+                           Margin="6"
+                           Padding="10"
+                           BackgroundColor="{DynamicResource CardBackgroundColor}">
+                                <Label Text="{Binding display_name}"
+                               FontSize="22"
+                               TextColor="{DynamicResource PrimaryTextColor}">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnDestinationSuggestionChosen"/>
+                                    </Label.GestureRecognizers>
+                                </Label>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <Button Text="Plan Journey"
+                        FontSize="24"
+                        FontAttributes="Bold"
+                        HeightRequest="80"
+                        CornerRadius="15"
+                        BackgroundColor="#B49BEB"
+                        TextColor="Black"
+                        Clicked="OnPlanJourneyClicked"
+                        SemanticProperties.Description="Tap to plan your journey" />
+
+                <CollectionView x:Name="AccessibleJourneyResults"
+                                IsVisible="True"
+                                SelectionMode="None"
+                                SemanticProperties.Description="Journey results in accessibility mode">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame CornerRadius="12"
+                                   BackgroundColor="{DynamicResource CardBackgroundColor}"
+                                   Margin="4"
+                                   Padding="10">
+                                <Label Text="{Binding}"
+                                       FontSize="22"
+                                       TextColor="{DynamicResource PrimaryTextColor}" />
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </ScrollView>
     </Grid>
 </ContentPage>
