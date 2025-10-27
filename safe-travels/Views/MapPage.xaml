@@ -99,12 +99,12 @@
                         Clicked="OnSearchStopsButtonClicked"
                         SemanticProperties.Description="Search stops by name" />
 
-                <!-- Vertical favorites list for accessibility view (above stops list) -->
+                <!-- Vertical favorites list for accessibility view - NOW SCALED TO MATCH STOPS LIST -->
                 <CollectionView x:Name="AccessibleFavoriteStops"
                                 SelectionMode="Single"
                                 SelectionChanged="OnFavoriteStopSelected"
                                 SemanticProperties.Description="Saved favorite stops"
-                                HeightRequest="140">
+                                HeightRequest="150">
                     <CollectionView.ItemsLayout>
                         <LinearItemsLayout Orientation="Vertical" />
                     </CollectionView.ItemsLayout>
@@ -113,13 +113,14 @@
                             <Border Background="{DynamicResource CardBackgroundColor}"
                                     StrokeShape="RoundRectangle 8"
                                     Margin="4"
-                                    Padding="8">
+                                    Padding="8"
+                                    WidthRequest="310">
                                 <VerticalStackLayout>
                                     <Label Text="{Binding DisplayLabel}"
-                                           FontSize="16"
+                                           FontSize="20"
                                            FontAttributes="Bold"
                                            SemanticProperties.Description="{Binding DisplayLabel}" />
-                                    <Label Text="{Binding stopId}" FontSize="12" />
+                                    <Label Text="{Binding stopId}" FontSize="14" />
                                 </VerticalStackLayout>
                             </Border>
                         </DataTemplate>

@@ -87,8 +87,26 @@ public partial class MapPage : ContentPage
     {
         if (e.CurrentSelection?.FirstOrDefault() is FavoriteStop fav)
         {
-            // clear selection immediately
-            FavoriteStopsCollection.SelectedItem = null;
+            // Clear selections from both collections immediately to prevent stuck state
+            var senderCollection = sender as CollectionView;
+            if (senderCollection != null)
+            {
+                senderCollection.SelectedItem = null;
+            }
+            
+            // Also clear the other favorites collection if it exists
+            if (senderCollection == FavoriteStopsCollection)
+            {
+                var accessibleFavorites = FindByName("AccessibleFavoriteStops") as CollectionView;
+                if (accessibleFavorites != null)
+                {
+                    accessibleFavorites.SelectedItem = null;
+                }
+            }
+            else if (string.Equals(senderCollection?.StyleId, "AccessibleFavoriteStops", StringComparison.Ordinal))
+            {
+                FavoriteStopsCollection.SelectedItem = null;
+            }
 
             var stopTripCalls = new InboundTripsAPI();
             var busDetails = await stopTripCalls.GetTripsByStopID(fav.stopId);
