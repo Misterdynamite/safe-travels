@@ -27,22 +27,14 @@ public partial class TrainDetailPage : ContentPage
     private async void onTrainSelected(object sender, SelectionChangedEventArgs e)
     {
 
+        TrainStopsCollection.ItemsSource = trips;
 
         var selectedTrip = e.CurrentSelection.FirstOrDefault() as TripStopData;
-        _stopId = selectedTrip.attributes.stopId;
-        _stopName = selectedTrip.attributes.stopHeadSign;
-
         if (selectedTrip == null || selectedTrip.attributes == null)
             return;
 
-        string stopName = selectedTrip.attributes.stopHeadSign;
-        {
-            if (!stopName.Contains("Train Station", StringComparison.OrdinalIgnoreCase))
-            {
-                await DisplayAlert("Not a Train Station", "This stop is not a train station.", "OK");
-                return;
-
-            }
+        _stopId = selectedTrip.attributes.stopId;
+        _stopName = selectedTrip.attributes.stopHeadSign;
 
             // Get service alerts for the stop (with automatic fallback)
             var alerts = await AucklandTransportAPIClient.GetServiceAlertsForStop(selectedTrip.attributes.stopId);
@@ -56,11 +48,11 @@ public partial class TrainDetailPage : ContentPage
             );
 
             await DisplayAlert("Service Status",
-                isRunning ? "This bus is currently running." : "This bus is not in service.",
+                isRunning ? "This train is currently running." : "This train is not in service.",
                 "OK");
-            await Navigation.PushAsync(new TrainDetailPage(new List<TripStopData> { selectedTrip }, selectedTrip.attributes.stopId, ""));
         }
-    }
+    
+    
 
 
         private void OnSaveStopClicked(object sender, EventArgs e)

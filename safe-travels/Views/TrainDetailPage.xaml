@@ -46,22 +46,6 @@
                     SemanticProperties.Hint="Double tap to save this stop to your favourites bar" />
         </HorizontalStackLayout>
 
-        <!-- Stop Summary Card -->
-        <Border Background="{DynamicResource CardBackgroundColor}" StrokeShape="RoundRectangle 12" Padding="23">
-            <VerticalStackLayout>
-                <Label Text="{Binding StopName}"
-                       FontSize="24"
-                       FontAttributes="Bold"
-                       SemanticProperties.Description="{Binding StopName}"
-                       SemanticProperties.Hint="Name of selected train stop" />
-                <Label Text="{Binding StopId, StringFormat='Stop ID: {0}'}"
-                       FontSize="14"
-                       TextColor="{DynamicResource PrimaryTextColor}"
-                       SemanticProperties.Description="Stop ID"
-                       SemanticProperties.Hint="Identifier for this stop" />
-            </VerticalStackLayout>
-        </Border>
-
         <!-- Upcoming Trains -->
         <Label Text="Upcoming Trains"
                FontSize="18"
@@ -69,7 +53,26 @@
                SemanticProperties.Description="Upcoming Trains"
                SemanticProperties.Hint="Below is a list of arriving trains" />
 
-        <!-- Trip List -->
+        <!-- Train Stops List -->
+        
+            <CollectionView
+        x:Name="TrainStopsCollection"
+        ItemsSource="{Binding TripStops}"
+        SelectionMode="Single"
+        SelectionChanged="onTrainSelected">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <StackLayout Padding="10">
+                                <Label Text="{Binding attributes.stopHeadSign}" FontSize="16" />
+                                <Label Text="{Binding attributes.stopId}" FontSize="12" TextColor="Gray" />
+                            </StackLayout>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+
+
+            <!-- Trip List -->
         <CollectionView x:Name="TrainCollection"
                         ItemsSource="{Binding Trips}"
                         SelectionMode="Single"
