@@ -3,10 +3,96 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="safe_travels.Views.ServiceAlertsPage"
              Title="ServiceAlertsPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+    <Grid>
+        <!-- ✅ NORMAL VIEW -->
+        <Grid x:Name="NormalView"
+              IsVisible="True"
+              Padding="15"
+              RowDefinitions="Auto,*">
+
+            <Label Text="Service Alerts"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   Margin="0,0,0,10"
+                   SemanticProperties.Description="Current Auckland Transport service alerts" />
+
+            <CollectionView x:Name="AlertsCollection"
+                            Grid.Row="1"
+                            SelectionMode="None"
+                            ItemsLayout="VerticalList">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame CornerRadius="12"
+                               Margin="6"
+                               Padding="12"
+                               BackgroundColor="{DynamicResource CardBackgroundColor}"
+                               HasShadow="True">
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="{Binding HeaderText}"
+                                       FontSize="18"
+                                       FontAttributes="Bold"
+                                       SemanticProperties.Description="{Binding HeaderText}" />
+                                <Label Text="{Binding RouteText}"
+                                       FontSize="14"
+                                       TextColor="Gray" />
+                                <Label Text="{Binding Description}"
+                                       FontSize="14"
+                                       TextColor="{DynamicResource SecondaryTextColor}"
+                                       LineBreakMode="WordWrap" />
+                                <Label Text="{Binding ActivePeriod}"
+                                       FontSize="12"
+                                       TextColor="Gray" />
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+
+        <!-- ✅ ACCESSIBILITY VIEW -->
+        <ScrollView x:Name="AccessibilityView"
+                    IsVisible="False"
+                    Padding="25">
+            <VerticalStackLayout Spacing="20">
+                <Label Text="Accessibility Mode Active"
+                       FontSize="28"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center" />
+                <Label Text="Service Alerts"
+                       FontSize="22"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center"
+                       SemanticProperties.Description="Current Auckland Transport service alerts" />
+
+                <CollectionView x:Name="AccessibleAlertsCollection"
+                                SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame CornerRadius="14"
+                                   Margin="8"
+                                   Padding="14"
+                                   BackgroundColor="{DynamicResource CardBackgroundColor}">
+                                <VerticalStackLayout Spacing="8">
+                                    <Label Text="{Binding HeaderText}"
+                                           FontSize="26"
+                                           FontAttributes="Bold"
+                                           SemanticProperties.Description="{Binding HeaderText}" />
+                                    <Label Text="{Binding RouteText}"
+                                           FontSize="22"
+                                           TextColor="Gray" />
+                                    <Label Text="{Binding Description}"
+                                           FontSize="22"
+                                           TextColor="{DynamicResource PrimaryTextColor}"
+                                           LineBreakMode="WordWrap" />
+                                    <Label Text="{Binding ActivePeriod}"
+                                           FontSize="20"
+                                           TextColor="{DynamicResource SecondaryTextColor}" />
+                                </VerticalStackLayout>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
 </ContentPage>

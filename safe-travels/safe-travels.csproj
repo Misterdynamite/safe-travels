@@ -85,6 +85,9 @@
     <MauiXaml Update="Views\MapPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
+    <MauiXaml Update="Views\ServiceAlertsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
     <MauiXaml Update="Views\TrainDetailPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>

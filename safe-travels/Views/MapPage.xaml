@@ -35,19 +35,52 @@
                            IsVisible="False"
                            SearchButtonPressed="OnStopSearch" />
 
-                <Button Text="Journey Planner"
-                        Margin="10,0,10,0"
-                        Clicked="OnJourneyPlannerClicked"
-                        HorizontalOptions="FillAndExpand" />
+                <Grid ColumnDefinitions="*,Auto"
+      Margin="10,0,10,0"
+      HorizontalOptions="FillAndExpand">
+
+                    <!-- Journey Planner button -->
+                    <Button Text="Journey Planner"
+            FontSize="20"
+            FontAttributes="Bold"
+            HeightRequest="50"
+            CornerRadius="12"
+            BackgroundColor="#B49BEB"
+            TextColor="Black"
+            Clicked="OnJourneyPlannerClicked"
+            Grid.Column="0"
+            HorizontalOptions="FillAndExpand"
+            SemanticProperties.Description="Open the Journey Planner" />
+
+                    <!-- Service Alerts icon button -->
+                    <Border Grid.Column="1"
+            Margin="6,0,0,0"
+            StrokeThickness="1"
+            Stroke="#8E75D6"
+            BackgroundColor="#B49BEB"
+            StrokeShape="RoundRectangle 12"
+            WidthRequest="50"
+            HeightRequest="50"
+            HorizontalOptions="End"
+            VerticalOptions="Center">
+                        <ImageButton Source="service_alerts.png"
+                     BackgroundColor="Transparent"
+                     WidthRequest="30"
+                     HeightRequest="30"
+                     Clicked="OnServiceAlertsClicked"
+                     SemanticProperties.Description="View service alerts"
+                     SemanticProperties.Hint="Double tap to open service alerts" />
+                    </Border>
+                </Grid>
             </VerticalStackLayout>
 
             <maps:Map x:Name="StopMap"
-                      MapType="Street"
-                      IsShowingUser="True"
-                      Grid.Row="1"
-                      VerticalOptions="FillAndExpand"
-                      HorizontalOptions="FillAndExpand" />
-
+         MapType="Street"
+         IsShowingUser="True"
+         Grid.Row="1"
+         VerticalOptions="FillAndExpand"
+         HorizontalOptions="FillAndExpand" />
+            
             <BoxView Grid.Row="2" HeightRequest="1" Color="#DDDDDD" VerticalOptions="Start" />
 
             <CollectionView x:Name="FavoriteStopsCollection"
@@ -229,11 +262,19 @@
                 <Button Text="Journey Planner"
                         FontSize="25"
                         FontAttributes="Bold"
-
                         HeightRequest="60"
                         WidthRequest="320"
                         CornerRadius="12"
                         Clicked="OnJourneyPlannerClicked"
+                        SemanticProperties.Description="Open journey planner" />
+
+                <Button Text="Service Alerts"
+                        FontSize="25"
+                        FontAttributes="Bold"
+                        HeightRequest="60"
+                        WidthRequest="320"
+                        CornerRadius="12"
+                        Clicked="OnServiceAlertsClicked"
                         SemanticProperties.Description="Open journey planner" />
 
                 <Button Text="Settings"
