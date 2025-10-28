@@ -29,6 +29,8 @@ public partial class JourneyPlannerPage : ContentPage
     private readonly Dictionary<string, LocationIQGeocodeResult?> _originGeocodeCache = new();
     private readonly Dictionary<string, LocationIQGeocodeResult?> _destinationGeocodeCache = new();
 
+    private bool _suppressAutocomplete = false;
+
     public JourneyPlannerPage()
     {
         InitializeComponent();
@@ -38,15 +40,15 @@ public partial class JourneyPlannerPage : ContentPage
         DestinationSuggestionsView.ItemsSource = _destinationSuggestions;
     }
 
-    
-
     #endregion
 
     #region Autocomplete Handlers
 
     private async void OnOriginTextChanged(object sender, TextChangedEventArgs e)
     {
-        _originDebounceCts?.Cancel(); // cancel previous debounce
+        if (_suppressAutocomplete) return;
+
+        _originDebounceCts?.Cancel();
         _originDebounceCts = new CancellationTokenSource();
 
         await HandleAutocompleteAsync(
@@ -59,7 +61,9 @@ public partial class JourneyPlannerPage : ContentPage
 
     private async void OnDestinationTextChanged(object sender, TextChangedEventArgs e)
     {
-        _destinationDebounceCts?.Cancel(); // cancel previous debounce
+        if (_suppressAutocomplete) return;
+
+        _destinationDebounceCts?.Cancel();
         _destinationDebounceCts = new CancellationTokenSource();
 
         await HandleAutocompleteAsync(
@@ -97,18 +101,15 @@ public partial class JourneyPlannerPage : ContentPage
 
         try
         {
-            // Wait for debounce delay
             await Task.Delay(DebounceDelay, token);
             token.ThrowIfCancellationRequested();
 
-            // Throttle additional requests
             var elapsed = DateTime.UtcNow - _lastRequestTime;
             if (elapsed < MinInterval)
                 await Task.Delay(MinInterval - elapsed, token);
 
             _lastRequestTime = DateTime.UtcNow;
 
-            // Call API
             List<LocationIQSuggestion> suggestions = await _locationIQ.GetAddressSuggestionsAsync(query);
             Debug.WriteLine($"{(isOrigin ? "Origin" : "Destination")} suggestions count: {suggestions.Count}");
 
@@ -121,6 +122,7 @@ public partial class JourneyPlannerPage : ContentPage
                 suggestionsView.ItemsSource = suggestionsCollection;
                 suggestionsView.IsVisible = suggestionsCollection.Any();
             });
+
             if (isOrigin && AccessibleOriginSuggestionsView != null)
             {
                 AccessibleOriginSuggestionsView.ItemsSource = suggestionsCollection;
@@ -146,8 +148,6 @@ public partial class JourneyPlannerPage : ContentPage
 
     #endregion
 
-
-
     #region Suggestion Selection
 
     private async void OnOriginSuggestionChosen(object sender, EventArgs e)
@@ -168,33 +168,41 @@ public partial class JourneyPlannerPage : ContentPage
         {
             var location = cached ?? await _locationIQ.GeocodeAddressAsync(selectedText);
             cache[selectedText] = location;
+
+            _suppressAutocomplete = true;
+
             if (isOrigin)
             {
                 _originLocation = location;
                 OriginInput.Text = selectedText;
+                AccessibleOriginInput.Text = selectedText;
                 OriginSuggestionsView.IsVisible = false;
 
-                // ✅ hide accessible list + sync text
-                if (AccessibleOriginSuggestionsView != null)
-                    AccessibleOriginSuggestionsView.IsVisible = false;
-                if (AccessibleOriginInput != null)
-                    AccessibleOriginInput.Text = selectedText;
+                AccessibleOriginSuggestionsView.IsVisible = false;
+                _originSuggestions.Clear();
+                AccessibleOriginSuggestionsView.ItemsSource = null;
+                OriginInput.Unfocus();
+                AccessibleOriginInput.Unfocus();
             }
             else
             {
                 _destinationLocation = location;
                 DestinationInput.Text = selectedText;
+                AccessibleDestinationInput.Text = selectedText;
                 DestinationSuggestionsView.IsVisible = false;
 
-                // ✅ hide accessible list + sync text
-                if (AccessibleDestinationSuggestionsView != null)
-                    AccessibleDestinationSuggestionsView.IsVisible = false;
-                if (AccessibleDestinationInput != null)
-                    AccessibleDestinationInput.Text = selectedText;
+                AccessibleDestinationSuggestionsView.IsVisible = false;
+                _destinationSuggestions.Clear();
+                AccessibleDestinationSuggestionsView.ItemsSource = null;
+                DestinationInput.Unfocus();
+                AccessibleDestinationInput.Unfocus();
             }
+
+            _suppressAutocomplete = false;
         }
         catch (Exception ex)
         {
+            _suppressAutocomplete = false;
             await DisplayAlert("Error", $"Failed to geocode {(isOrigin ? "origin" : "destination")}: {ex.Message}", "OK");
         }
     }
@@ -202,6 +210,67 @@ public partial class JourneyPlannerPage : ContentPage
     #endregion
 
     #region Journey Planning
+
+    private static string TruncateRouteId(string routeId)
+    {
+        if (string.IsNullOrEmpty(routeId)) return routeId;
+        int idx = routeId.IndexOf('-');
+        return idx > 0 ? routeId.Substring(0, idx) : routeId;
+    }
+
+    private static async Task<HashSet<string>> FindRoutesAsync(IEnumerable<Stop> originStops, IEnumerable<Stop> destStops)
+    {
+        var routes = new HashSet<string>();
+        var stopTripsCache = new Dictionary<string, List<TripStopResponse>>();
+
+        async Task<List<TripStopResponse>> GetTripsCached(string stopId)
+        {
+            if (!stopTripsCache.TryGetValue(stopId, out var trips))
+            {
+                trips = await AucklandTransportAPIClient.GetTripsForStop(stopId);
+                stopTripsCache[stopId] = trips;
+            }
+            return trips;
+        }
+
+        var allStops = originStops.Concat(destStops).DistinctBy(s => s.stopId).ToList();
+        await Task.WhenAll(allStops.Select(s => GetTripsCached(s.stopId)));
+
+        var originRoutes = new HashSet<string>(
+            originStops.SelectMany(o => stopTripsCache[o.stopId])
+                       .SelectMany(resp => resp.data.Select(t => t.attributes.routeId)));
+
+        var destRoutes = new HashSet<string>(
+            destStops.SelectMany(d => stopTripsCache[d.stopId])
+                     .SelectMany(resp => resp.data.Select(t => t.attributes.routeId)));
+
+        var directRoutes = originRoutes.Intersect(destRoutes).ToList();
+
+        if (directRoutes.Any())
+        {
+            foreach (var route in directRoutes)
+            {
+                string displayRoute = TruncateRouteId(route);
+                var originServingStops = originStops
+                    .Where(o => stopTripsCache[o.stopId]
+                        .Any(resp => resp.data.Any(t => t.attributes.routeId == route)))
+                    .Select(o => o.stopName)
+                    .Distinct()
+                    .ToList();
+
+                foreach (var stopName in originServingStops)
+                {
+                    routes.Add($"• Route: {displayRoute}\nFrom: {stopName}\n(Direct connection within 1 km)");
+                }
+            }
+        }
+        else
+        {
+            routes.Add("No direct bus route found within 1 km of both locations.");
+        }
+
+        return routes;
+    }
 
     private async void OnPlanJourneyClicked(object sender, EventArgs e)
     {
@@ -239,8 +308,7 @@ public partial class JourneyPlannerPage : ContentPage
             SemanticScreenReader.Announce(
                 _journeyResults.Any()
                     ? $"Found {_journeyResults.Count} possible routes."
-                    : "No routes found."
-            );
+                    : "No routes found.");
         }
     }
 
@@ -250,75 +318,14 @@ public partial class JourneyPlannerPage : ContentPage
             double.Parse(location.lat), double.Parse(location.lon), 500);
     }
 
-    private static async Task<HashSet<string>> FindRoutesAsync(IEnumerable<Stop> originStops, IEnumerable<Stop> destStops)
-    {
-        var routes = new HashSet<string>();
-        var stopTripsCache = new Dictionary<string, List<TripStopResponse>>();
-
-        async Task<List<TripStopResponse>> GetTripsCached(string stopId)
-        {
-            if (!stopTripsCache.TryGetValue(stopId, out var trips))
-            {
-                trips = await AucklandTransportAPIClient.GetTripsForStop(stopId);
-                stopTripsCache[stopId] = trips;
-            }
-            return trips;
-        }
-
-        // Fetch trips for all nearby stops concurrently
-        var allStops = originStops.Concat(destStops).DistinctBy(s => s.stopId).ToList();
-        await Task.WhenAll(allStops.Select(s => GetTripsCached(s.stopId)));
-
-        // 1️⃣ Collect all routes serving nearby origin stops
-        var originRoutes = new HashSet<string>(
-            originStops.SelectMany(o => stopTripsCache[o.stopId])
-                       .SelectMany(resp => resp.data.Select(t => t.attributes.routeId)));
-
-        // 2️⃣ Collect all routes serving nearby destination stops
-        var destRoutes = new HashSet<string>(
-            destStops.SelectMany(d => stopTripsCache[d.stopId])
-                     .SelectMany(resp => resp.data.Select(t => t.attributes.routeId)));
-
-        // 3️⃣ Find routes in common (direct connections)
-        var directRoutes = originRoutes.Intersect(destRoutes).ToList();
-
-        if (directRoutes.Any())
-        {
-            foreach (var route in directRoutes)
-            {
-                // Find the origin stop(s) serving this route
-                var originServingStops = originStops
-                    .Where(o => stopTripsCache[o.stopId]
-                        .Any(resp => resp.data.Any(t => t.attributes.routeId == route)))
-                    .Select(o => o.stopName)
-                    .Distinct()
-                    .ToList();
-
-                foreach (var stopName in originServingStops)
-                {
-                    routes.Add($"Direct bus route {route} connects origin (from stop \"{stopName}\") and destination (within 1 km).");
-                }
-            }
-        }
-        else
-        {
-            routes.Add("No direct bus route found within 1 km of both locations.");
-        }
-
-        return routes;
-    }
-
-    #endregion
-
     protected override void OnAppearing()
     {
         base.OnAppearing();
 
-        // Get saved accessibility mode preference
         bool isAccessibilityMode = Preferences.Get("AccessibilityMode", false);
-
-        // Toggle layouts accordingly
         NormalView.IsVisible = !isAccessibilityMode;
         AccessibilityView.IsVisible = isAccessibilityMode;
     }
+
+    #endregion
 }
