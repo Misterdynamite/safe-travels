@@ -351,10 +351,8 @@ public partial class MapPage : ContentPage
     
     private bool IsTrainStop(string stopName)
     {
-        return stopName.Contains("Train Station", StringComparison.OrdinalIgnoreCase)
-            || stopName.Contains("Station", StringComparison.OrdinalIgnoreCase)
-            || stopName.Contains("Train", StringComparison.OrdinalIgnoreCase);
-    }
+        return stopName.Contains("Train", StringComparison.OrdinalIgnoreCase);
+         }
     /// <summary>
     /// Handles nearby stops click events.
     /// </summary>

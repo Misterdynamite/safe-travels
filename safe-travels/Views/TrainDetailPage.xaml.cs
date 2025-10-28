@@ -47,9 +47,14 @@ public partial class TrainDetailPage : ContentPage
                 "AT"
             );
 
-            await DisplayAlert("Service Status",
-                isRunning ? "This train is currently running." : "This train is not in service.",
-                "OK");
+
+        if (isRunning == true)
+        {
+            await DisplayAlert("Train Status", "This train is currently running.", "OK");
+        }
+        else
+            await DisplayAlert("Train Status", "This train is not in service.", "OK");
+
         }
     
     
