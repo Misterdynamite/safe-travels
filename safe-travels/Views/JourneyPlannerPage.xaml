@@ -193,7 +193,8 @@
                         TextColor="Black"
                         Clicked="OnPlanJourneyClicked"
                         SemanticProperties.Description="Tap to plan your journey" />
-
+                <ScrollView  HeightRequest="270"
+                    IsVisible="True">
                 <CollectionView x:Name="AccessibleJourneyResults"
                                 IsVisible="True"
                                 SelectionMode="None"
@@ -211,6 +212,7 @@
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
+                </ScrollView>
             </VerticalStackLayout>
         </ScrollView>
     </Grid>

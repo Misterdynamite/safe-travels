@@ -170,15 +170,27 @@ public partial class JourneyPlannerPage : ContentPage
             cache[selectedText] = location;
             if (isOrigin)
             {
+                _originLocation = location;
+                OriginInput.Text = selectedText;
                 OriginSuggestionsView.IsVisible = false;
+
+                // ✅ hide accessible list + sync text
                 if (AccessibleOriginSuggestionsView != null)
                     AccessibleOriginSuggestionsView.IsVisible = false;
+                if (AccessibleOriginInput != null)
+                    AccessibleOriginInput.Text = selectedText;
             }
             else
             {
+                _destinationLocation = location;
+                DestinationInput.Text = selectedText;
                 DestinationSuggestionsView.IsVisible = false;
+
+                // ✅ hide accessible list + sync text
                 if (AccessibleDestinationSuggestionsView != null)
                     AccessibleDestinationSuggestionsView.IsVisible = false;
+                if (AccessibleDestinationInput != null)
+                    AccessibleDestinationInput.Text = selectedText;
             }
         }
         catch (Exception ex)
@@ -215,6 +227,21 @@ public partial class JourneyPlannerPage : ContentPage
             _journeyResults.Add(route);
 
         JourneyResults.IsVisible = true;
+
+        if (AccessibleJourneyResults != null)
+        {
+            AccessibleJourneyResults.ItemsSource = _journeyResults;
+            AccessibleJourneyResults.IsVisible = _journeyResults.Any();
+        }
+
+        if (AccessibilityView.IsVisible)
+        {
+            SemanticScreenReader.Announce(
+                _journeyResults.Any()
+                    ? $"Found {_journeyResults.Count} possible routes."
+                    : "No routes found."
+            );
+        }
     }
 
     private static async Task<IEnumerable<Stop>> FetchStopsAsync(LocationIQGeocodeResult location)
