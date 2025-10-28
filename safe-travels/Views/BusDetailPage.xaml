@@ -35,12 +35,12 @@
 
             <VerticalStackLayout>
                 <Label Text="{Binding StopName}"
-                       FontSize="24"
+                       FontSize="25"
                        FontAttributes="Bold"/>
             </VerticalStackLayout>
         </Border>
 
-        <Label Text="Upcoming Buses" FontSize="18" FontAttributes="Bold"
+        <Label Text="Upcoming Buses" FontSize="25" FontAttributes="Bold" Margin="10"
                SemanticProperties.Description="Upcoming Buses"
             />
         

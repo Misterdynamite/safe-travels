@@ -121,6 +121,16 @@ public partial class JourneyPlannerPage : ContentPage
                 suggestionsView.ItemsSource = suggestionsCollection;
                 suggestionsView.IsVisible = suggestionsCollection.Any();
             });
+            if (isOrigin && AccessibleOriginSuggestionsView != null)
+            {
+                AccessibleOriginSuggestionsView.ItemsSource = suggestionsCollection;
+                AccessibleOriginSuggestionsView.IsVisible = suggestionsCollection.Any();
+            }
+            else if (!isOrigin && AccessibleDestinationSuggestionsView != null)
+            {
+                AccessibleDestinationSuggestionsView.ItemsSource = suggestionsCollection;
+                AccessibleDestinationSuggestionsView.IsVisible = suggestionsCollection.Any();
+            }
         }
         catch (TaskCanceledException)
         {
@@ -158,18 +168,17 @@ public partial class JourneyPlannerPage : ContentPage
         {
             var location = cached ?? await _locationIQ.GeocodeAddressAsync(selectedText);
             cache[selectedText] = location;
-
             if (isOrigin)
             {
-                _originLocation = location;
-                OriginInput.Text = selectedText;
                 OriginSuggestionsView.IsVisible = false;
+                if (AccessibleOriginSuggestionsView != null)
+                    AccessibleOriginSuggestionsView.IsVisible = false;
             }
             else
             {
-                _destinationLocation = location;
-                DestinationInput.Text = selectedText;
                 DestinationSuggestionsView.IsVisible = false;
+                if (AccessibleDestinationSuggestionsView != null)
+                    AccessibleDestinationSuggestionsView.IsVisible = false;
             }
         }
         catch (Exception ex)

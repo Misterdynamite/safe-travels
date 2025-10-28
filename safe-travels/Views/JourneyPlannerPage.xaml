@@ -16,8 +16,8 @@
             <VerticalStackLayout Grid.Row="1" Padding="15" Spacing="15" ZIndex="2">
 
                 <!-- Journey Section -->
-                <Label Text="YOUR JOURNEY" FontSize="18" FontAttributes="Bold"/>
-                <Label Text="Choose your journey" FontSize="14" TextColor="Gray"/>
+                <Label Text="YOUR JOURNEY" FontSize="25" FontAttributes="Bold"/>
+                <Label Text="Choose your journey" FontSize="20"/>
 
                 <!-- Origin Input -->
                 <Entry x:Name="OriginInput"
@@ -51,7 +51,6 @@
                 <Entry x:Name="DestinationInput"
                    Placeholder="Enter destination address..."
                    TextColor="{DynamicResource SecondaryTextColor}"
-                   FontAttributes="Bold"
                    TextChanged="OnDestinationTextChanged"
                    Margin="0,5"/>
 
@@ -81,7 +80,7 @@
                             IsVisible="False">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Label Text="{Binding}" Padding="10" TextColor="Black"/>
+                            <Label Text="{Binding}" Padding="10" FontSize="19"/>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
