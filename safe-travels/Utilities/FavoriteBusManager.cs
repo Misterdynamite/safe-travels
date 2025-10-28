@@ -10,12 +10,18 @@ namespace safe_travels.Utilities
     internal static class FavoriteBusManager
     {
         private const string FavoriteStopsKey = "favorite_stops";
+        
+        // Event to notify when favorites change
+        public static event EventHandler? FavoritesChanged;
 
         public static void SaveFavoriteStops(List<FavoriteStop> stops)
         {
             var options = new JsonSerializerOptions { WriteIndented = false };
             string json = JsonSerializer.Serialize(stops, options);
             Preferences.Set(FavoriteStopsKey, json);
+            
+            // Notify that favorites have changed
+            FavoritesChanged?.Invoke(null, EventArgs.Empty);
         }
 
         public static List<FavoriteStop> LoadFavoriteStops()
