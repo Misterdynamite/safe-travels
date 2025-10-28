@@ -104,6 +104,15 @@ namespace safe_travels.API.AucklandTransportAPI
                 Debug.WriteLine($"Fetched {matchingTrips.Count} trips for stop ID {stopIdInput}");
                 return matchingTrips;
             }
+            catch (HttpRequestException httpEx)
+            {
+                Debug.WriteLine($"HTTP error fetching trips for stop ID {stopIdInput}: {httpEx.Message}");
+                if (httpEx.StatusCode != null)
+                {
+                    Debug.WriteLine($"HTTP Status Code: {(int)httpEx.StatusCode} ({httpEx.StatusCode})");
+                }
+                return new List<TripStopResponse>();
+            }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error fetching trips for stop ID {stopIdInput}: {ex.Message}");
