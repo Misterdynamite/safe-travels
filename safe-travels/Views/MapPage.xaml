@@ -78,94 +78,158 @@
         <!-- Accessibility view (alternate layout) -->
         <ScrollView x:Name="AccessibilityView"
                     IsVisible="False"
-                    Padding="20"
+                    Padding="2"
                     BackgroundColor="{DynamicResource PageBackgroundColor}">
             <VerticalStackLayout Spacing="16">
                 <Label Text="Accessibility Mode Active"
-                       FontSize="22"
+                       FontSize="25"
                        FontAttributes="Bold"
                        SemanticProperties.Description="Accessibility mode is active"
                        HorizontalOptions="Center" />
 
-                <Label Text="Map view hidden for screen reader users. Use buttons below to navigate."
+                <Label Text="Map view hidden for screen reader users.&#10;Use buttons below to navigate."
                        FontSize="16"
-                       SemanticProperties.Description="Instructions for screen reader users" />
-
-                <Button Text="Nearby Stops"
-                        Clicked="OnNearbyStopsButtonClicked"
-                        SemanticProperties.Description="Show nearby bus stops" />
+                       HorizontalOptions="Center"
+                       SemanticProperties.Description="Map view hidden for screen reader users.Use buttons below to navigate." />
 
                 <Button Text="Search Stops by Name"
+                        FontSize="25"
+                        FontAttributes="Bold"
+                        HeightRequest="60"
+                        WidthRequest="320"
+                        CornerRadius="12"
                         Clicked="OnSearchStopsButtonClicked"
                         SemanticProperties.Description="Search stops by name" />
 
+                <VerticalStackLayout x:Name="AccessibleSearchSection"
+                     IsVisible="False"
+                     Spacing="10"
+                     WidthRequest="320"
+                     HorizontalOptions="Center">
+
+                    <Label Text="Enter Stop Name"
+                           FontSize="22"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"
+                           SemanticProperties.Description="Enter the stop name to search" />
+
+                    <Entry x:Name="AccessibleSearchEntry"
+                           Placeholder="Type a stop name..."
+                           FontSize="22"
+                           HeightRequest="60"
+                           TextColor="{DynamicResource PrimaryTextColor}"
+                           Completed="OnAccessibleSearchCompleted"
+                           SemanticProperties.Description="Text field to enter the stop name" />
+
+                    <CollectionView x:Name="AccessibleSearchResults"
+                                    IsVisible="False"
+                                    SelectionMode="Single"
+                                    SelectionChanged="OnAccessibleSearchResultSelected"
+                                    SemanticProperties.Description="List of stops matching your search">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{DynamicResource CardBackgroundColor}"
+                                        StrokeShape="RoundRectangle 8"
+                                        Margin="4"
+                                        Padding="8">
+                                    <VerticalStackLayout>
+                                        <Label Text="{Binding stopName}"
+                                               FontSize="22"
+                                               FontAttributes="Bold"
+                                               SemanticProperties.Description="{Binding stopName}" />
+                                        <Label Text="{Binding stopId}"
+                                               FontSize="18"
+                                               TextColor="{DynamicResource SecondaryTextColor}" />  
+                                    </VerticalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+
+                <Button Text="Nearby Stops"
+                        FontSize="25"
+                        FontAttributes="Bold"
+                        HeightRequest="60"
+                        WidthRequest="320"
+                        CornerRadius="12"
+                        Clicked="OnNearbyStopsButtonClicked"
+                        SemanticProperties.Description="Show nearby bus stops, Toggle to hide." />
+
                 <!-- Vertical favorites list for accessibility view - NOW SCALED TO MATCH STOPS LIST -->
-                <CollectionView x:Name="AccessibleFavoriteStops"
+                <VerticalStackLayout Spacing="10"
+                                     WidthRequest="300">
+                    <Label Text="Favorite Stops"
+                           FontSize="25"
+                           FontAttributes="Bold"/>
+                    <CollectionView x:Name="AccessibleFavoriteStops"
                                 SelectionMode="Single"
                                 SelectionChanged="OnFavoriteStopSelected"
                                 SemanticProperties.Description="Saved favorite stops"
-                                HeightRequest="150">
+                                HeightRequest="200">
                     <CollectionView.ItemsLayout>
                         <LinearItemsLayout Orientation="Vertical" />
                     </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Border Background="{DynamicResource CardBackgroundColor}"
+                                <Border Background="{DynamicResource CardBackgroundColor}"
                                     StrokeShape="RoundRectangle 8"
                                     Margin="4"
-                                    Padding="8"
-                                    WidthRequest="310">
-                                <VerticalStackLayout>
-                                    <Label Text="{Binding DisplayLabel}"
-                                           FontSize="20"
+                                    Padding="4">
+                                    <VerticalStackLayout>
+                                        <Label Text="{Binding DisplayLabel}"
+                                           FontSize="25"
                                            FontAttributes="Bold"
                                            SemanticProperties.Description="{Binding DisplayLabel}" />
-                                    <Label Text="{Binding stopId}" FontSize="14" />
-                                </VerticalStackLayout>
-                            </Border>
+                                        
+                                    </VerticalStackLayout>
+                                </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-
+                </VerticalStackLayout>
                 <!-- Accessible stops list (batched via code-behind) -->
-                <CollectionView x:Name="AccessibleStopsList"
+                <VerticalStackLayout Spacing="10"
+                                     WidthRequest="300">
+                    <Label Text="Stops Near You"
+                           FontSize="25"
+                           FontAttributes="Bold"/>
+                    <CollectionView x:Name="AccessibleStopsList"
                                 IsVisible="True"
                                 SelectionMode="Single"
                                 SelectionChanged="OnAccessibleStopSelected"
                                 SemanticProperties.Description="List of bus stops">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Border Background="{DynamicResource CardBackgroundColor}"
+                                <Border Background="{DynamicResource CardBackgroundColor}"
                                     StrokeShape="RoundRectangle 8"
                                     Margin="4"
-                                    Padding="8"
-                                    WidthRequest="310">
-                                <VerticalStackLayout>
-                                    <Label Text="{Binding stopName}"
-                                           FontSize="20"
+                                    Padding="4">
+                                    <VerticalStackLayout>
+                                        <Label Text="{Binding stopName}"
+                                           FontSize="25"
                                            FontAttributes="Bold"
-                                           SemanticProperties.Description="{Binding stopName}" />
-                                    <Label Text="{Binding stopId}" FontSize="14" />
-                                </VerticalStackLayout>
+                                           SemanticProperties.Description="{Binding stopName}"/>
+                                    </VerticalStackLayout>
                             </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-
+                </VerticalStackLayout>
                 <Button x:Name="ShowMoreButton"
                         Text="Show More Stops"
-                        FontSize="18"
+                        FontSize="25"
                         FontAttributes="Bold"
                         HeightRequest="60"
                         WidthRequest="320"
                         CornerRadius="12"
-                        IsVisible="False"
                         Clicked="OnShowMoreClicked"
                         SemanticProperties.Description="Load more nearby bus stops" />
 
                 <Button Text="Journey Planner"
-                        FontSize="18"
+                        FontSize="25"
                         FontAttributes="Bold"
+
                         HeightRequest="60"
                         WidthRequest="320"
                         CornerRadius="12"
@@ -173,6 +237,11 @@
                         SemanticProperties.Description="Open journey planner" />
 
                 <Button Text="Settings"
+                        FontSize="25"
+                        FontAttributes="Bold"
+                        HeightRequest="60"
+                        WidthRequest="320"
+                        CornerRadius="12"
                         Clicked="OnSettingsClicked"
                         SemanticProperties.Description="Open settings page" />
 

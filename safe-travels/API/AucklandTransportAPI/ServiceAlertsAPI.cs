@@ -167,7 +167,7 @@ namespace safe_travels.API.AucklandTransportAPI
             {
                 DateTime start = DateTimeOffset.FromUnixTimeSeconds(period.Start).DateTime;
                 DateTime end = DateTimeOffset.FromUnixTimeSeconds(period.End).DateTime;
-                
+
                 if (now >= start && now <= end)
                 {
                     // Check if alert affects the route/stop/agency
@@ -195,21 +195,27 @@ namespace safe_travels.API.AucklandTransportAPI
         /// <returns>True if the trip is running, false otherwise.</returns>
         public bool IsServiceRunning(TripStopAttributes trip, List<ServiceAlert> alerts, DateTime now, string agencyId = "")
         {
-            // Check service date
-            if (!DateTime.TryParse(trip.serviceDate, out DateTime serviceDate) || serviceDate.Date != now.Date)
+            DateTime serviceDate;
+            bool parsed = DateTime.TryParse(trip.serviceDate, out serviceDate) || DateTime.TryParseExact(trip.serviceDate, "yyyyMMdd", null, System.Globalization.DateTimeStyles.None, out serviceDate);
+
+            if ( !parsed || serviceDate.Date != now.Date)
                 return false;
+            //parse start and end times
+            if (!TimeSpan.TryParse(trip.tripStartTime, out TimeSpan startTime) ||
+                !TimeSpan.TryParse(trip.arrivalTime, out TimeSpan endTime))
+            {
+                return false;
+            }
+
+            DateTime tripStart = serviceDate.Date.Add(startTime);
+            DateTime tripEnd = serviceDate.Date.Add(endTime);
+            if (now < tripStart || now > tripEnd)
+                return false;
+
 
             // Check pickup / dropoff
-            if (trip.pickupType != 0 || trip.dropOffType != 0)
+            if (trip.pickupType > 1 || trip.dropOffType > 1)
                 return false;
-
-            // Check time window
-            if (!DateTime.TryParse(trip.tripStartTime, out DateTime tripStart) || !DateTime.TryParse(trip.arrivalTime, out DateTime arrival))
-                return false;
-
-            if (now.TimeOfDay < tripStart.TimeOfDay || now.TimeOfDay > arrival.TimeOfDay)
-                return false;
-
             // Check service alerts
             foreach (var alert in alerts)
             {

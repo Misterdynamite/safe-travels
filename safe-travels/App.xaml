@@ -14,7 +14,7 @@
                          Color="{AppThemeBinding Light=Black, Dark=White}" />
 
             <SolidColorBrush x:Key="SecondaryTextColor" 
-                         Color="{AppThemeBinding Light=Gray, Dark=#cccccc}" />
+                         Color="{AppThemeBinding Light=Black, Dark=White}" />
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
