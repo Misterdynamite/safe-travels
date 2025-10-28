@@ -564,4 +564,9 @@ public partial class MapPage : ContentPage
         AccessibleSearchResults.SelectedItem = null;
     }
     #endregion
+
+    private async void OnServiceAlertsClicked(object sender, EventArgs e)
+    {
+        await Navigation.PushAsync(new ServiceAlertsPage());
+    }
 }
