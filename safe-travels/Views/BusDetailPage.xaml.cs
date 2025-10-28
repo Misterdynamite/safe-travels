@@ -15,8 +15,10 @@ public partial class BusDetailPage : ContentPage
     private string _stopName;
     private string _stopId;
     private List<TripStopData>? trips;
+    private List<TripStopData> _currentTrips = new(); // Store loaded trips for filtering and display
     private System.Threading.Timer? _refreshTimer;
     private bool _isRefreshing = false;
+    private bool _isNavigating = false; // Debounce flag
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BusDetailPage"/> class.
@@ -54,30 +56,10 @@ public partial class BusDetailPage : ContentPage
         await Task.Run(() =>
         {
             var tripsList = trips.SelectMany(t => t.data).ToList();
-            
-            // Debug print for each trip to see the data
-            System.Diagnostics.Debug.WriteLine($"=== BusDetailPage Loading {tripsList.Count} trips ===");
-            foreach (var trip in tripsList.Take(5)) // Just first 5 for debugging
-            {
-                System.Diagnostics.Debug.WriteLine($"\nTrip: {trip.attributes.routeId} to {trip.attributes.stopHeadSign}");
-                System.Diagnostics.Debug.WriteLine($"  Arrival: '{trip.attributes.arrivalTime}'");
-                System.Diagnostics.Debug.WriteLine($"  TripStart: '{trip.attributes.tripStartTime}'");
-                System.Diagnostics.Debug.WriteLine($"  ServiceDate: '{trip.attributes.serviceDate}'");
-                System.Diagnostics.Debug.WriteLine($"  Countdown property: '{trip.attributes.ArrivalCountdown}'");
-                System.Diagnostics.Debug.WriteLine($"  MinutesUntilArrival: {trip.attributes.MinutesUntilArrival}");
-            }
-            
-            // Update UI on main thread
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                BindingContext = new
-                {
-                    StopName = _stopName,
-                    StopId = _stopId,
-                    Trips = tripsList,
-                };
-                
-                // Hide loading indicator
+                _currentTrips = tripsList;
+                BusCollection.ItemsSource = tripsList;
                 LoadingIndicator.IsRunning = false;
                 LoadingIndicator.IsVisible = false;
             });
@@ -116,19 +98,10 @@ public partial class BusDetailPage : ContentPage
     {
         await Task.Run(() =>
         {
-            this.trips = trips;
-            
-            // Update UI on main thread
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                BindingContext = new
-                {
-                    StopName = _stopName,
-                    StopId = _stopId,
-                    Trips = trips,
-                };
-                
-                // Hide loading indicator
+                _currentTrips = trips;
+                BusCollection.ItemsSource = trips;
                 LoadingIndicator.IsRunning = false;
                 LoadingIndicator.IsVisible = false;
             });
@@ -201,13 +174,9 @@ public partial class BusDetailPage : ContentPage
     /// <param name="stopHeadsign">The headsign to filter by. If null or empty, all buses are shown.</param>
     public void FilterBuses(string stopHeadsign)
     {
-        //cast bindingcontext ot a dynamic to access trips
-        var context = (dynamic)BindingContext;
-        var trips = (List<TripStopData>)context.Trips;
-
+        var trips = _currentTrips;
         if (trips == null)
             return;
-
         // filter by headsign using a case-insensitive partial match
         var filtered = string.IsNullOrEmpty(stopHeadsign)
             ? trips
@@ -216,7 +185,6 @@ public partial class BusDetailPage : ContentPage
                 !string.IsNullOrEmpty(bus.attributes.stopHeadSign) &&
                 bus.attributes.stopHeadSign.Contains(stopHeadsign, StringComparison.OrdinalIgnoreCase)
             ).ToList();
-
         BusCollection.ItemsSource = filtered;
     }
 
@@ -262,46 +230,56 @@ public partial class BusDetailPage : ContentPage
     /// </summary>
     private async void OnBusSelected(object sender, SelectionChangedEventArgs e)
     {
-        if (e.CurrentSelection?.FirstOrDefault() is TripStopData selectedBus)
+        if (_isNavigating) return;
+        _isNavigating = true;
+        try
         {
-            string action = await DisplayActionSheet(
-                $"Bus to '{selectedBus.attributes.stopHeadSign}'",
-                "Cancel",
-                null,
-                "View Full Route",
-                "Set Arrival Alert");
+            if (e.CurrentSelection?.FirstOrDefault() is TripStopData selectedBus)
+            {
+                string action = await DisplayActionSheet(
+                    $"Bus to '{selectedBus.attributes.stopHeadSign}'",
+                    "Cancel",
+                    null,
+                    "View Full Route",
+                    "Set Arrival Alert");
 
-            if (action == "View Full Route")
-            {
-                // Navigate to TripStopsPage to show all stops on this trip
-                await Navigation.PushAsync(new TripStopsPage(
-                    selectedBus.attributes.tripId,
-                    selectedBus.attributes.routeId,
-                    selectedBus.attributes.stopHeadSign,
-                    selectedBus.attributes.serviceDate,
-                    selectedBus.attributes.tripStartTime));
-            }
-            else if (action == "Set Arrival Alert")
-            {
-                string[] options = { "1 minute", "3 minutes", "5 minutes", "10 minutes" };
-                string chosen = await DisplayActionSheet(
-                    $"Set alert for bus to '{selectedBus.attributes.stopHeadSign}'?",
-                    "Cancel", null, options);
-                int minutes = chosen switch
+                if (action == "View Full Route")
                 {
-                    "1 minute" => 1,
-                    "3 minutes" => 3,
-                    "5 minutes" => 5,
-                    "10 minutes" => 10,
-                    _ => 0
-                };
-                if (minutes > 0)
+                    // Navigate to TripStopsPage to show all stops on this trip
+                    await Navigation.PushAsync(new TripStopsPage(
+                        selectedBus.attributes.tripId,
+                        selectedBus.attributes.routeId,
+                        selectedBus.attributes.stopHeadSign,
+                        selectedBus.attributes.serviceDate,
+                        selectedBus.attributes.tripStartTime));
+                }
+                else if (action == "Set Arrival Alert")
                 {
-                    await ScheduleBusArrivalNotification(selectedBus, minutes);
+                    string[] options = { "1 minute", "3 minutes", "5 minutes", "10 minutes" };
+                    string chosen = await DisplayActionSheet(
+                        $"Set alert for bus to '{selectedBus.attributes.stopHeadSign}'?",
+                        "Cancel", null, options);
+                    int minutes = chosen switch
+                    {
+                        "1 minute" => 1,
+                        "3 minutes" => 3,
+                        "5 minutes" => 5,
+                        "10 minutes" => 10,
+                        _ => 0
+                    };
+                    if (minutes > 0)
+                    {
+                        await ScheduleBusArrivalNotification(selectedBus, minutes);
+                    }
                 }
             }
+            BusCollection.SelectedItem = null;
         }
-        BusCollection.SelectedItem = null;
+        finally
+        {
+            await Task.Delay(1000);
+            _isNavigating = false;
+        }
     }
 
     /// <summary>
@@ -352,27 +330,18 @@ public partial class BusDetailPage : ContentPage
     {
         // Prevent multiple simultaneous refreshes
         if (_isRefreshing) return;
-        
         _isRefreshing = true;
-        
         try
         {
             System.Diagnostics.Debug.WriteLine($"Auto-refreshing trips for stop {_stopId}...");
-            
             var stopTripCalls = new InboundTripsAPI();
             var busDetails = await stopTripCalls.GetTripsByStopID(_stopId);
             var tripsList = busDetails.SelectMany(t => t.data).ToList();
-            
             // Update on UI thread
             await MainThread.InvokeOnMainThreadAsync(() =>
             {
-                BindingContext = new
-                {
-                    StopName = _stopName,
-                    StopId = _stopId,
-                    Trips = tripsList,
-                };
-                
+                _currentTrips = tripsList;
+                BusCollection.ItemsSource = tripsList;
                 System.Diagnostics.Debug.WriteLine($"Refreshed {tripsList.Count} trips");
             });
         }

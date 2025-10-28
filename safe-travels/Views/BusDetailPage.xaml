@@ -4,108 +4,114 @@
              x:Class="safe_travels.Views.BusDetailPage"
              Title="Bus Stop">
 
-    <VerticalStackLayout Padding="20" Spacing="8">
-        <SearchBar x:Name="TripSearchBar"
-                   SemanticProperties.Description="Trip Search Bar"
-                   SemanticProperties.Hint="Enter keywords to search for bus trips"
-                   Placeholder="Search buses..."
-                   TextChanged="OnSearchTextChanged"
-                   HorizontalOptions="CenterAndExpand" />
-        <Picker x:Name="FilterPicker"
-                Title="Filter trips"
-                SemanticProperties.Description="Tap to filter Buss Details"
-                SemanticProperties.Hint="Swipe up or down to choose a filter"
-                HorizontalOptions="FillAndExpand">
-            <Picker.Items>
-                <x:String>All</x:String>
-                <x:String>Arriving Soon</x:String>
-                <x:String>Favorites</x:String>
-            </Picker.Items>
-        </Picker>
-        <HorizontalStackLayout Spacing="10">
-            <Button x:Name="SaveStopButton"
-                    Text="Save Stop"
-                    SemanticProperties.Description="Tap to save this stop"
-                    SemanticProperties.Hint="Double tap to save this stop to your favourites bar"
-                    Clicked="OnSaveStopClicked"
-                    HorizontalOptions="End" />
-            
-        </HorizontalStackLayout>
-        <Border Background="{DynamicResource CardBackgroundColor}" StrokeShape="RoundRectangle 12" Padding="23">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="8">
+            <SearchBar x:Name="TripSearchBar"
+                       SemanticProperties.Description="Trip Search Bar"
+                       SemanticProperties.Hint="Enter keywords to search for bus trips"
+                       Placeholder="Search buses..."
+                       TextChanged="OnSearchTextChanged"
+                       HorizontalOptions="CenterAndExpand" />
+            <Picker x:Name="FilterPicker"
+                    Title="Filter trips"
+                    SemanticProperties.Description="Tap to filter Buss Details"
+                    SemanticProperties.Hint="Swipe up or down to choose a filter"
+                    HorizontalOptions="FillAndExpand">
+                <Picker.Items>
+                    <x:String>All</x:String>
+                    <x:String>Arriving Soon</x:String>
+                    <x:String>Favorites</x:String>
+                </Picker.Items>
+            </Picker>
+            <HorizontalStackLayout Spacing="10">
+                <Button x:Name="SaveStopButton"
+                        Text="Save Stop"
+                        SemanticProperties.Description="Tap to save this stop"
+                        SemanticProperties.Hint="Double tap to save this stop to your favourites bar"
+                        Clicked="OnSaveStopClicked"
+                        HorizontalOptions="End" />
 
-            <VerticalStackLayout>
-                <Label Text="{Binding StopName}"
-                       FontSize="24"
-                       FontAttributes="Bold"/>
-            </VerticalStackLayout>
-        </Border>
+            </HorizontalStackLayout>
+            <Border Background="{DynamicResource CardBackgroundColor}" StrokeShape="RoundRectangle 12" Padding="23">
 
-        <Label Text="Upcoming Buses" FontSize="18" FontAttributes="Bold"
-               SemanticProperties.Description="Upcoming Buses"
-            />
-        
-        <!-- Loading Indicator -->
-        <ActivityIndicator x:Name="LoadingIndicator"
-                          IsRunning="True"
-                          IsVisible="True"
-                          Color="{DynamicResource Primary}"
-                          HorizontalOptions="Center"
-                          VerticalOptions="Center"
-                          Margin="20"/>
+                <VerticalStackLayout>
+                    <Label Text="{Binding StopName}"
+                           FontSize="24"
+                           FontAttributes="Bold"/>
+                </VerticalStackLayout>
+            </Border>
 
-        <CollectionView x:Name="BusCollection"
-                ItemsSource="{Binding Trips}"
-                SelectionMode="Single"
-                SelectionChanged="OnBusSelected">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Border Background="{DynamicResource CardBackgroundColor}" StrokeShape="RoundRectangle 8" Margin="0,4" Padding="12">
-                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
-                            <!-- Destination -->
-                            <Label Grid.Row="0" Grid.Column="0" 
-                                   Text="{Binding attributes.stopHeadSign}" 
-                                   FontSize="16" FontAttributes="Bold"/>
-                            
-                            <!-- Countdown Badge (shows on right side when available) -->
-                            <Border Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
-                                    x:Name="CountdownBorder"
-                                    BackgroundColor="#00C853" 
-                                    StrokeShape="RoundRectangle 8" 
-                                    Padding="10,6"
-                                    VerticalOptions="Center"
-                                    Margin="8,0,0,0">
-                                <Border.Triggers>
-                                    <DataTrigger TargetType="Border" Binding="{Binding attributes.ArrivalCountdown}" Value="">
-                                        <Setter Property="IsVisible" Value="False"/>
-                                    </DataTrigger>
-                                    <DataTrigger TargetType="Border" Binding="{Binding attributes.MinutesUntilArrival}" Value="0">
-                                        <Setter Property="BackgroundColor" Value="#D32F2F"/>
-                                    </DataTrigger>
-                                </Border.Triggers>
-                                <Label Text="{Binding attributes.ArrivalCountdown}" 
-                                       FontSize="18" 
-                                       FontAttributes="Bold" 
-                                       TextColor="White"
-                                       HorizontalTextAlignment="Center"
-                                       VerticalTextAlignment="Center"/>
-                            </Border>
-                            
-                            <!-- Route Number --><!--
-                            <Label Grid.Row="1" Grid.Column="0" 
-                                   Text="{Binding attributes.routeId, StringFormat='Route {0}'}" 
-                                   FontSize="14"
-                                   TextColor="{DynamicResource SecondaryTextColor}"/>-->
-                            
-                            <!-- Arrival Time -->
-                            <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
-                                   Text="{Binding attributes.arrivalTime, StringFormat='Arrives: {0}'}" 
-                                   FontSize="13" 
-                                   TextColor="{DynamicResource PrimaryTextColor}"
-                                   Margin="0,4,0,0"/>
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-    </VerticalStackLayout>
+            <Label Text="Upcoming Buses" FontSize="18" FontAttributes="Bold"
+                   SemanticProperties.Description="Upcoming Buses"
+                />
+
+            <!-- Loading Indicator -->
+            <ActivityIndicator x:Name="LoadingIndicator"
+                              IsRunning="True"
+                              IsVisible="True"
+                              Color="{DynamicResource Primary}"
+                              HorizontalOptions="Center"
+                              VerticalOptions="Center"
+                              Margin="20"/>
+
+            <!-- Fixed height CollectionView for proper scrolling -->
+            <CollectionView x:Name="BusCollection"
+                    ItemsSource="{Binding Trips}"
+                    SelectionMode="Single"
+                    SelectionChanged="OnBusSelected"
+                    HeightRequest="400"
+                    VerticalOptions="FillAndExpand">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="{DynamicResource CardBackgroundColor}" StrokeShape="RoundRectangle 8" Margin="0,4" Padding="12">
+                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
+                                <!-- Destination -->
+                                <Label Grid.Row="0" Grid.Column="0" 
+                                       Text="{Binding attributes.stopHeadSign}" 
+                                       FontSize="16" FontAttributes="Bold"/>
+
+                                <!-- Countdown Badge (shows on right side when available) -->
+                                <Border Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
+                                        x:Name="CountdownBorder"
+                                        BackgroundColor="#00C853" 
+                                        StrokeShape="RoundRectangle 8" 
+                                        Padding="10,6"
+                                        VerticalOptions="Center"
+                                        Margin="8,0,0,0">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding attributes.ArrivalCountdown}" Value="">
+                                            <Setter Property="IsVisible" Value="False"/>
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Border" Binding="{Binding attributes.MinutesUntilArrival}" Value="0">
+                                            <Setter Property="BackgroundColor" Value="#D32F2F"/>
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Label Text="{Binding attributes.ArrivalCountdown}" 
+                                           FontSize="18" 
+                                           FontAttributes="Bold" 
+                                           TextColor="White"
+                                           HorizontalTextAlignment="Center"
+                                           VerticalTextAlignment="Center"/>
+                                </Border>
+
+                                <!-- Route Number -->
+                                <!--
+                                <Label Grid.Row="1" Grid.Column="0" 
+                                       Text="{Binding attributes.routeId, StringFormat='Route {0}'}" 
+                                       FontSize="14"
+                                       TextColor="{DynamicResource SecondaryTextColor}"/>-->
+
+                                <!-- Arrival Time -->
+                                <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                       Text="{Binding attributes.arrivalTime, StringFormat='Arrives: {0}'}" 
+                                       FontSize="13" 
+                                       TextColor="{DynamicResource PrimaryTextColor}"
+                                       Margin="0,4,0,0"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>
